@@ -54,6 +54,7 @@ namespace Bridger
 					}
 					if(Input.GetMouseButtonUp(0))
 					{
+						Debug.Log("Should Test!");
 						if(currentPart.partLength < Grid.gridSize)
 						{
 							Destroy(currentPart.gameObject);

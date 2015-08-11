@@ -9,7 +9,7 @@ public class GridGUI : MonoBehaviour
 	public Color gridColor, secondaryColor;
 	public int strongLineSpace = 5;
 
-	private Material lineMaterial;
+	public Material lineMaterial;
 	private Camera cam;
 
 	private Vector2 origin;
@@ -22,7 +22,6 @@ public class GridGUI : MonoBehaviour
 	}
 
 	void OnPostRender() {
-		GLFunctionality.CreateDefaultLineMaterial(ref lineMaterial);
 		GL.PushMatrix();
 		lineMaterial.SetPass(0);
 		GL.LoadOrtho();
