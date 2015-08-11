@@ -6,7 +6,9 @@ namespace Bridger
 	[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 	public class BridgePart : MonoBehaviour, IResetable
 	{
+		static int partID = 0;
 		TransformData resetTransform;
+		public bool streching = true;
 		public BridgePartType materialType;
 
 		private Rigidbody2D rigid;
@@ -33,11 +35,15 @@ namespace Bridger
 			instance.rigid = instance.GetComponent<Rigidbody2D>();
 			instance.rigid.isKinematic = true;
 			instance.transform.position = (Vector3)instance.partOrigin;
+			instance.name += partID;
+			partID++;
+			Debug.Log("Instantiated new!");
 			return instance;
 		}
 
 		public void Strech(Vector2 strech)
 		{
+			streching = true;
 			Vector2 relation = Grid.ToGrid (Vector2.ClampMagnitude (strech - partOrigin, materialType.maxLength));
 			transform.position = (partOrigin + relation / 2);
 			transform.rotation = Quaternion.AngleAxis (Angles.Angle (Vector2.right, relation, false), Vector3.forward);
@@ -45,6 +51,13 @@ namespace Bridger
 		}
 		public void EndStrech()
 		{
+			streching = false;
+			Debug.Log("Ending " + name);
+			if(partLength < Grid.gridSize)
+			{
+				Destroy(gameObject);
+				return;
+			}
 			SetupJoint(partOrigin);
 			SetupJoint(partEnd);
 			rigid.mass = partMass;

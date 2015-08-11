@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Bridger
 {
@@ -11,7 +13,7 @@ namespace Bridger
 
 		Vector2 mousePosition{ get{return (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);} }
 		BridgePart currentPart;
-
+		BridgePart lastPart;
 		public enum ConstructionMode
 		{
 			BUILD,
@@ -26,44 +28,23 @@ namespace Bridger
 
 		void Update()
 		{
-			DoConstruction();
-			DoCommands();
-		}
-
-		void DoConstruction()
-		{
 			switch (mode)
 			{
 			case ConstructionMode.BUILD:
-				if(Input.GetMouseButtonDown(0))
+				PointerEventData pe = new PointerEventData(EventSystem.current);
+				pe.position = Input.mousePosition;
+				
+				List<RaycastResult> hits = new List<RaycastResult>();
+				EventSystem.current.RaycastAll( pe, hits );
+				bool notUI = true;
+				
+				foreach (RaycastResult h in hits)
 				{
-					if(currentPart != null && Input.GetKey(KeyCode.LeftShift))
-					{
-						currentPart = BridgePart.Create(partType, currentPart.partEnd);
-					}
-					else
-					{
-						currentPart = BridgePart.Create(partType, mousePosition);
-					}
+					notUI &= (h.gameObject.layer != 5);//if all pass as other layers, notUI will remain true;
 				}
-				if(currentPart != null)
+				if (notUI)
 				{
-					if(Input.GetMouseButton(0))
-					{
-						currentPart.Strech(mousePosition);
-					}
-					if(Input.GetMouseButtonUp(0))
-					{
-						Debug.Log("Should Test!");
-						if(currentPart.partLength < Grid.gridSize)
-						{
-							Destroy(currentPart.gameObject);
-						}
-						else
-						{
-						currentPart.EndStrech();
-						}
-					}
+					DoConstruction();
 				}
 				break;
 			case ConstructionMode.EREASE:
@@ -73,6 +54,44 @@ namespace Bridger
 			default:
 				break;
 			}
+			DoCommands();
+			if(lastPart != currentPart)
+			{
+				Debug.Log("partChange!");
+			}
+			lastPart = currentPart;
+		}
+
+		void DoConstruction()
+		{
+
+
+			if(Input.GetMouseButtonDown(0))
+			{
+
+				if(currentPart != null) 
+				{
+					if(currentPart.streching)
+					{currentPart.EndStrech();}
+					currentPart = BridgePart.Create(partType, (Input.GetKey(KeyCode.LeftShift) ? currentPart.partEnd : mousePosition));
+				}
+				else
+				{
+					currentPart = BridgePart.Create(partType, mousePosition);
+				}
+			}
+			if(currentPart != null)
+			{
+				if(Input.GetMouseButton(0))
+				{
+					currentPart.Strech(mousePosition);
+				}
+				if(Input.GetMouseButtonUp(0))
+				{
+					currentPart.EndStrech();
+				}
+			}
+			
 		}
 
 		void DoCommands()
@@ -82,10 +101,18 @@ namespace Bridger
 				if(Input.GetKeyDown(KeyCode.Z))
 				{
 					Level.Undo(Level.currentItem);
+					if(Level.currentItem.GetType().Equals(typeof(BridgePart)))
+					{
+						currentPart = (BridgePart)Level.currentItem;
+					}
 				}
 				if(Input.GetKeyDown(KeyCode.R))
 				{
 					Level.Redo(Level.lastItem);
+					if(Level.currentItem.GetType().Equals(typeof(BridgePart)))
+					{
+						currentPart = (BridgePart)Level.currentItem;
+					}
 				}
 			}
 
