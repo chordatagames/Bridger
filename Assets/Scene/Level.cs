@@ -17,6 +17,7 @@ namespace Bridger
 			levelObjects.Add(part);
 			if(part is IRevertable)
 			{
+				redoStack.Clear();
 				undoStack.Push((IRevertable)part);
 			}
 		}
