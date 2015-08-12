@@ -40,6 +40,7 @@ namespace Bridger
 			foreach(IRevertable part in undoStack)
 			{
 				part.Remove();
+				levelObjects.Remove((IReloadable)part);
 			}
 			undoStack.Clear();
 			redoStack.Clear();
