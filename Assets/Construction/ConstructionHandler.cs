@@ -8,12 +8,15 @@ namespace Bridger
 //TODO add object pooling from a "Level"-class
 	public class ConstructionHandler : MonoBehaviour
 	{
+		public static ConstructionHandler instance;
+		public Canvas BuildUICanvas;
 		public BridgePartType partType;
 		public ConstructionMode mode = ConstructionMode.BUILD;
 
 		Vector2 mousePosition{ get{return (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);} }
-		BridgePart currentPart;
+		BridgePart buildingPart;
 		BridgePart lastPart;
+
 		public enum ConstructionMode
 		{
 			BUILD,
@@ -23,6 +26,14 @@ namespace Bridger
 
 		void Awake()
 		{
+			if(instance != null && instance != this)
+			{
+				Destroy(this);
+			}
+			else
+			{
+				instance = this;
+			}
 			DontDestroyOnLoad(this);
 		}
 
@@ -55,40 +66,34 @@ namespace Bridger
 				break;
 			}
 			DoCommands();
-			if(lastPart != currentPart)
-			{
-				Debug.Log("partChange!");
-			}
-			lastPart = currentPart;
 		}
 
 		void DoConstruction()
 		{
 
-
 			if(Input.GetMouseButtonDown(0))
 			{
 
-				if(currentPart != null) 
+				if(buildingPart != null) 
 				{
-					if(currentPart.streching)
-					{currentPart.EndStrech();}
-					currentPart = BridgePart.Create(partType, (Input.GetKey(KeyCode.LeftShift) ? currentPart.partEnd : mousePosition));
+					if(buildingPart.editing)
+					{buildingPart.EndStrech();}
+					buildingPart = BridgePart.Create(partType, (Input.GetKey(KeyCode.LeftShift) ? buildingPart.partEnd : mousePosition));
 				}
 				else
 				{
-					currentPart = BridgePart.Create(partType, mousePosition);
+					buildingPart = BridgePart.Create(partType, mousePosition);
 				}
 			}
-			if(currentPart != null)
+			if(buildingPart != null)
 			{
 				if(Input.GetMouseButton(0))
 				{
-					currentPart.Strech(mousePosition);
+					buildingPart.Strech(mousePosition);
 				}
 				if(Input.GetMouseButtonUp(0))
 				{
-					currentPart.EndStrech();
+					buildingPart.EndStrech();
 				}
 			}
 			
@@ -100,19 +105,11 @@ namespace Bridger
 			{
 				if(Input.GetKeyDown(KeyCode.Z))
 				{
-					Level.Undo(Level.currentItem);
-					if(Level.currentItem.GetType().Equals(typeof(BridgePart)))
-					{
-						currentPart = (BridgePart)Level.currentItem;
-					}
+					Level.Undo();
 				}
 				if(Input.GetKeyDown(KeyCode.R))
 				{
-					Level.Redo(Level.lastItem);
-					if(Level.currentItem.GetType().Equals(typeof(BridgePart)))
-					{
-						currentPart = (BridgePart)Level.currentItem;
-					}
+					Level.Redo();
 				}
 			}
 

@@ -5,67 +5,72 @@ namespace Bridger
 {
 	public static class Level
 	{
-		public static IResetable currentItem{ get{return (levelObjects.Count > 0) ? levelObjects[_levelObjectIndex] : null;} }
-		public static IResetable lastItem{ get{return _lastItem;} }
+		static List<IReloadable> levelObjects = new List<IReloadable>();
 
-		static int _levelObjectIndex = 0;
-		static IResetable _lastItem;
-		static List<IResetable> levelObjects = new List<IResetable>();
+		public static IRevertable currentItem{ get{return undoStack.Peek();} }
 
-		
-		public static void AddToLevel(IResetable part)
+		static Stack<IRevertable> undoStack = new Stack<IRevertable>();
+		static Stack<IRevertable> redoStack = new Stack<IRevertable>();
+
+		public static void AddToLevel(IReloadable part)
 		{
-			_lastItem = currentItem;
 			levelObjects.Add(part);
-			_levelObjectIndex = levelObjects.Count-1;
+			if(part is IRevertable)
+			{
+				undoStack.Push((IRevertable)part);
+			}
 		}
 		
 		public static void StartPhysics()
 		{
-			foreach(IResetable part in levelObjects)
+			foreach(IReloadable part in levelObjects)
 			{
 				part.StartPhysics();
 			}
 		}
 		public static void Reload()
 		{
-			foreach(IResetable part in levelObjects)
+			foreach(IReloadable part in levelObjects)
 			{
 				part.Reset();
 			}
 		}
 		public static void Clear()
 		{
-			foreach(IResetable part in levelObjects)
+			foreach(IRevertable part in undoStack)
 			{
-				Undo(part);
+				part.Remove();
+			}
+			undoStack.Clear();
+			redoStack.Clear();
+		}
+
+		public static void Undo()
+		{
+			if(undoStack.Count > 0)
+			{
+				if(undoStack.Peek().Undo())//Sucessfully undo
+				{
+					redoStack.Push(undoStack.Pop());
+				}
 			}
 		}
 
-		public static void Undo(IResetable part)
+		public static void Redo()
 		{
-			Debug.Log("Pooling");
-			if(part.Pool())
+			if(redoStack.Count > 0)
 			{
-				_lastItem = currentItem;
-				_levelObjectIndex--;
-			}
-		}
-
-		public static void Redo(IResetable part)
-		{
-			Debug.Log("Unpooling");
-			if(part.UnPool())
-			{
-				_lastItem = currentItem;
-				_levelObjectIndex++;
+				if(redoStack.Peek().Redo())//Sucessfully redo
+				{
+					undoStack.Push(redoStack.Pop());
+				}
 			}
 		}
 
 //		static public void Undo(GameObject removeObject)
 //		{
 //			//FIXME if part is connected by another part (i.e. connectedBody of another part) this will cause problems //FIXED?
-//			IResetable<MonoBehaviour> removePart;
+//			IReloadable<MonoBehaviour> removePart;
 //			if(levelObjects.TryGetValue(removeObject, out removePart))
 //			{
 //				if(removePart.GetType().Equals(typeof(BridgePart)))
@@ -113,12 +118,17 @@ namespace Bridger
 	/// <summary>
 	/// I resetable.
 	/// </summary>
-	public interface IResetable
+	public interface IReloadable
 	{
 		void Reset();
 		void StartPhysics();
-		bool UnPool();
-		bool Pool();
+
+	}
+	public interface IRevertable
+	{
+		bool Undo();
+		bool Redo();
+		void Remove();
 	}
 }
 

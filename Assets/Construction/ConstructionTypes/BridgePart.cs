@@ -1,14 +1,16 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 namespace Bridger
 {
 	[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
-	public class BridgePart : MonoBehaviour, IResetable
+	public class BridgePart : MonoBehaviour, IReloadable, IRevertable
 	{
+		Image bridgeJointUI;
 		static int partID = 0;
 		TransformData resetTransform;
-		public bool streching = true;
+		public bool editing = true;
 		public BridgePartType materialType;
 
 		private Rigidbody2D rigid;
@@ -43,7 +45,7 @@ namespace Bridger
 
 		public void Strech(Vector2 strech)
 		{
-			streching = true;
+			editing = true;
 			Vector2 relation = Grid.ToGrid (Vector2.ClampMagnitude (strech - partOrigin, materialType.maxLength));
 			transform.position = (partOrigin + relation / 2);
 			transform.rotation = Quaternion.AngleAxis (Angles.Angle (Vector2.right, relation, false), Vector3.forward);
@@ -51,7 +53,7 @@ namespace Bridger
 		}
 		public void EndStrech()
 		{
-			streching = false;
+			editing = false;
 			Debug.Log("Ending " + name);
 			if(partLength < Grid.gridSize)
 			{
@@ -67,6 +69,9 @@ namespace Bridger
 
 		GameObject CreateJointCollider(Vector2 position)
 		{
+//			Image bridgeJointUI = new GameObject(this.name + "jointUI").AddComponent<Image>();
+
+
 			GameObject go = new GameObject("joint");//TODO set UI sprite as well
 			go.AddComponent<CircleCollider2D>().radius = Grid.gridSize/4;
 			go.layer = 9; //JOINT
@@ -105,15 +110,20 @@ namespace Bridger
 				bridgejoint.enabled = false;
 				bridgejoint.joint.enabled = false;
 			}
+			if(_connectedTo.Count == 1)
+			{
+//				bridgeJointUI.enabled = false;
+			}
 		}
 
 		public void DetachAll()//TODO rename function
 		{
-			foreach(BridgeJoint bridgejoint in connectedTo)
+			foreach(BridgeJoint bridgejoint in _connectedTo)
 			{
 				bridgejoint.enabled = false;
 				bridgejoint.joint.enabled = false;
 			}
+//			bridgeJointUI.enabled = false;
 		}
 
 		public void Attach(BridgeJoint bridgejoint)
@@ -123,15 +133,17 @@ namespace Bridger
 				bridgejoint.enabled = true;
 				bridgejoint.joint.enabled = true;
 			}
+//			bridgeJointUI.enabled = true;
 		}
 
 		public void AttachAll()//TODO rename function
 		{
-			foreach(BridgeJoint bridgejoint in connectedTo)
+			foreach(BridgeJoint bridgejoint in _connectedTo)
 			{
 				bridgejoint.enabled = true;
 				bridgejoint.joint.enabled = true;
 			}
+//			bridgeJointUI.enabled = true;
 		}
 
 		public void Reset()
@@ -151,17 +163,22 @@ namespace Bridger
 		{
 			rigid.isKinematic = false;
 		}
-		public bool Pool()
+		public bool Undo()
 		{
 			DetachAll();
 			gameObject.SetActive(false);
 			return !gameObject.activeInHierarchy;
 		}
-		public bool UnPool()
+		public bool Redo()
 		{
 			AttachAll();
 			gameObject.SetActive(true);
 			return gameObject.activeInHierarchy;
+		}
+		public void Remove()
+		{
+			DetachAll();
+			Destroy(gameObject);
 		}
 	}
 }

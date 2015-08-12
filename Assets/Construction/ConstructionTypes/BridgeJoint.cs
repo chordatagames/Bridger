@@ -38,7 +38,7 @@ namespace Bridger
 			}
 		}
 
-		public float jointStrength	{ get{return (anchorPart.materialType.strength + connectedPart.materialType.strength)/jointMass;} }
+		public float jointStrength	{ get{return Mathf.Min(anchorPart.materialType.strength, connectedPart.materialType.strength);} }
 		public float jointMass		{ get{return (anchorPart.partMass + connectedPart.partMass);} }
 
 		public void Start()
@@ -52,6 +52,7 @@ namespace Bridger
 		{
 			if(anchorPart.materialType.strength > 0)
 			{
+
 				if(joint.GetReactionForce(Time.deltaTime).magnitude > jointStrength)
 				{
 					Break();

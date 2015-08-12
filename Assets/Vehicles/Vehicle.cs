@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Bridger
 {
-	public class Vehicle : MonoBehaviour, IResetable
+	public class Vehicle : MonoBehaviour, IReloadable
 	{
 		public Color vehicleColor;
 		public VehicleType type;
