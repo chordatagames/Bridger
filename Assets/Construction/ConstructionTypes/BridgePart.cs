@@ -71,7 +71,6 @@ namespace Bridger
 		{
 //			Image bridgeJointUI = new GameObject(this.name + "jointUI").AddComponent<Image>();
 
-
 			GameObject go = new GameObject("joint");//TODO set UI sprite as well
 			go.AddComponent<CircleCollider2D>().radius = Grid.gridSize/4;
 			go.layer = 9; //JOINT

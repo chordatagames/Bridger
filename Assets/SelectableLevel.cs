@@ -7,9 +7,11 @@ public class SelectableLevel : MonoBehaviour
 	public int levelID;
 	public GameObject PopupPanel;
 
-	public Color highlightColor;
-	public float highlightHeight, highlightSpeed;
-	Vector3 position;
+	public Color selectedColor;
+	public float selectMoveHeight, selectMoveSpeed;
+
+	Bridger.TransformData origin;
+	bool highlit;
 
 	Renderer renderer;
 
@@ -18,28 +20,53 @@ public class SelectableLevel : MonoBehaviour
 		renderer = GetComponent<Renderer>();
 	}
 
-	void OnEnable()
+	void Start()
 	{
 		PopupPanel.SetActive(false);
+		origin = new Bridger.TransformData(transform);
 	}
 
-	public void Highlight()
+	public void Select()
 	{
-		position = transform.position;
-		StartCoroutine(DoHighlight());
+		StartCoroutine("SelectMove", origin.localPosition + Vector3.up*selectMoveHeight);
 		PopupPanel.SetActive(true);
+		highlit = true;
+	}
+	public void UnSelect()
+	{
+		if(highlit)
+		{
+			StopCoroutine("SelectMove");
+			origin.Reload(transform);
+			highlit = false;
+		}
 	}
 
-	IEnumerator DoHighlight()
+	IEnumerator SelectMove(Vector3 target)
 	{
-		Vector3 target = position+Vector3.up*highlightHeight;
-		while(Vector3.Distance(transform.position, target) < 0.05f )
+		while(Vector3.Distance(transform.position, target) > 0.05f )
 		{
 			if(renderer != null)
 			{
-				renderer.material.color = Color.Lerp(renderer.material.color, highlightColor, highlightSpeed * Time.deltaTime);
+				renderer.material.color = Color.Lerp(
+					renderer.material.color, 
+					selectedColor, 
+					selectMoveSpeed * Time.deltaTime);
 			}
-			transform.position = Vector3.Lerp(transform.position, target, highlightSpeed * Time.deltaTime);
+
+			transform.position = Vector3.Lerp(
+				transform.position, 
+				target, 
+				selectMoveSpeed * Time.deltaTime);
+
+			transform.Rotate(
+				Vector3.up,
+				Mathf.LerpAngle(0,180, selectMoveSpeed * Time.deltaTime));
+
+			transform.localScale = Vector3.Lerp(
+				transform.localScale, 
+				origin.localScale + Vector3.one * selectMoveHeight,
+				selectMoveSpeed * Time.deltaTime);
 
 			yield return null;
 		}
