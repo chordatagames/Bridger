@@ -29,6 +29,11 @@ public class SelectableLevel : MonoBehaviour
 		origin = new Bridger.TransformData(transform);
 	}
 
+	public void EnterLevel()
+	{
+		Application.LoadLevel(levelID);
+	}
+
 	public void Select()
 	{
 
