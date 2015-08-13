@@ -52,10 +52,10 @@ namespace Bridger
 		{
 			if(anchorPart.materialType.strength > 0)
 			{
-
 				if(joint.GetReactionForce(Time.deltaTime).magnitude > jointStrength)
 				{
 					Break();
+					Level.Slowmo();
 				}
 			}
 		}

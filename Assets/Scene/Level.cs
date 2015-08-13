@@ -5,6 +5,7 @@ namespace Bridger
 {
 	public static class Level
 	{
+		static float timeBendFactor = 1;
 		static List<IReloadable> levelObjects = new List<IReloadable>();
 
 		public static IRevertable currentItem{ get{return undoStack.Peek();} }
@@ -68,34 +69,17 @@ namespace Bridger
 				}
 			}
 		}
+		public static void Slowmo()
+		{
+			Time.timeScale *= 0.75f;
+			Time.fixedDeltaTime = 0.02F * Time.timeScale;
+		}
 
-//		static public void Undo(GameObject removeObject)
-//		{
-//			//FIXME if part is connected by another part (i.e. connectedBody of another part) this will cause problems //FIXED?
-//			IReloadable<MonoBehaviour> removePart;
-//			if(levelObjects.TryGetValue(removeObject, out removePart))
-//			{
-//				if(removePart.GetType().Equals(typeof(BridgePart)))
-//				{
-//					foreach (BridgeJoint joint in ((BridgePart)removePart).connectedTo)
-//					{
-//						((BridgePart)removePart).Detatch(joint);
-//					}
-//				}
-//			}
-//
-//			levelObjectStack.Remove(removeObject);
-//			levelObjects.Remove(removeObject);
-//			GameObject.Destroy(removeObject);
-//		}
-//
-//		public static void UndoLast()
-//		{
-//			if(levelObjectStack.Count > 0)
-//			{
-//				Undo(levelObjectStack.ToArray()[levelObjectStack.Count-1]);
-//			}
-//		}
+		public static void UnSlowmo()
+		{
+			Time.timeScale = 1f;
+			Time.fixedDeltaTime = 0.02F * Time.timeScale;
+		}
 	}
 	[System.Serializable]
 	public struct TransformData
@@ -118,14 +102,16 @@ namespace Bridger
 
 	}
 	/// <summary>
-	/// I resetable.
+	/// An interface that makes the object able to reset to it's defined original state
 	/// </summary>
 	public interface IReloadable
 	{
 		void Reset();
 		void StartPhysics();
-
 	}
+	/// <summary>
+	/// Implements the normal Undo/Redo/Clear functionalities 
+	/// </summary>
 	public interface IRevertable
 	{
 		bool Undo();

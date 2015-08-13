@@ -16,5 +16,18 @@ public class LevelUIManager: MonoBehaviour
 	{
 		Level.Clear();
 	}
+	public void Undo()
+	{
+		Level.Undo();
+	}
+	public void Redo()
+	{
+		Level.Undo();
+	}
+
+	public void UnSlowmo()
+	{
+		Level.UnSlowmo();
+	}
 
 }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEditor;
 using System.Collections;
 
 namespace Bridger
@@ -6,7 +7,7 @@ namespace Bridger
 	public class GoalZone : MonoBehaviour
 	{
 		public Vehicle[] acceptedVehicles;
-
+		public float radius;
 		private bool _completed;
 		public bool completed{ get{return _completed;} }
 		void OnTriggerEnter2D(Collider2D col)
@@ -24,6 +25,10 @@ namespace Bridger
 					break;
 				}
 			}
+		}
+		void Update()
+		{
+
 		}
 	}
 }

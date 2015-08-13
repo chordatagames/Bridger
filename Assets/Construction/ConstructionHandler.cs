@@ -6,6 +6,7 @@ using System.Collections.Generic;
 namespace Bridger
 {
 //TODO add object pooling from a "Level"-class
+	[RequireComponent(typeof(DontLoadDestroy))]
 	public class ConstructionHandler : MonoBehaviour
 	{
 		public static ConstructionHandler instance;
@@ -34,7 +35,6 @@ namespace Bridger
 			{
 				instance = this;
 			}
-			DontDestroyOnLoad(this);
 		}
 
 		void Update()
