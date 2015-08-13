@@ -3,6 +3,8 @@ using System.Collections;
 
 public class LevelSelector : MonoBehaviour
 {
+	public SelectableLevel[] availableLevels;
+	
 	void Update ()
 	{
 		if(Input.GetMouseButtonDown(0))

@@ -5,19 +5,22 @@ using System.Collections;
 public class SelectableLevel : MonoBehaviour
 {
 	public int levelID;
+
 	public GameObject PopupPanel;
+	Animator popupAnim;
 
 	public Color selectedColor;
 	public float selectMoveHeight, selectMoveSpeed;
 
 	Bridger.TransformData origin;
-	bool highlit;
+	bool selected;
 
 	Renderer renderer;
 
 	void Awake()
 	{
 		renderer = GetComponent<Renderer>();
+		popupAnim = PopupPanel.GetComponent<Animator>();
 	}
 
 	void Start()
@@ -28,17 +31,20 @@ public class SelectableLevel : MonoBehaviour
 
 	public void Select()
 	{
+
 		StartCoroutine("SelectMove", origin.localPosition + Vector3.up*selectMoveHeight);
 		PopupPanel.SetActive(true);
-		highlit = true;
+		selected = true;
+		popupAnim.SetBool("selected",selected);
 	}
 	public void UnSelect()
 	{
-		if(highlit)
+		if(selected)
 		{
 			StopCoroutine("SelectMove");
 			origin.Reload(transform);
-			highlit = false;
+			selected = false;
+			popupAnim.SetBool(0,selected);
 		}
 	}
 
