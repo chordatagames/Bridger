@@ -5,7 +5,9 @@ namespace Bridger
 {
 	public static class Level
 	{
-		static float timeBendFactor = 1;
+		public const float slowMotionTimeScale = 0.075f; //7.5%
+		static float slowTimeSpeed = 1.25f;
+
 		static List<IReloadable> levelObjects = new List<IReloadable>();
 
 		public static IRevertable currentItem{ get{return undoStack.Peek();} }
@@ -71,16 +73,18 @@ namespace Bridger
 		}
 		public static void Slowmo()
 		{
-			Time.timeScale *= 0.75f;
-			Time.fixedDeltaTime = 0.02F * Time.timeScale;
+			ConstructionHandler.instance.SlowMo(slowTimeSpeed);
 		}
 
 		public static void UnSlowmo()
 		{
-			Time.timeScale = 1f;
-			Time.fixedDeltaTime = 0.02F * Time.timeScale;
+			ConstructionHandler.instance.UnSlowMo();
 		}
+
+
+
 	}
+
 	[System.Serializable]
 	public struct TransformData
 	{

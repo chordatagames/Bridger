@@ -22,7 +22,8 @@ namespace Bridger
 		{
 			BUILD,
 			EREASE,
-			MODIFY
+			MODIFY,
+			PLAY
 		}
 
 		void Awake()
@@ -112,7 +113,41 @@ namespace Bridger
 					Level.Redo();
 				}
 			}
+		}
 
+		public void PlayMode()
+		{
+			mode = ConstructionMode.PLAY;
+		}
+		public void BuildMode()
+		{
+			mode = ConstructionMode.BUILD;
+		}
+
+		public void SlowMo(float transitionTime)
+		{
+			StartCoroutine("SlowMotion", transitionTime);
+		}
+
+		public void UnSlowMo()
+		{
+			StopCoroutine("SlowMotion");
+			Time.timeScale = 1f;
+			Time.fixedDeltaTime = 0.02F * Time.timeScale;
+		}
+
+		IEnumerator SlowMotion(float transitionTime)
+		{
+			while(Time.timeScale != Level.slowMotionTimeScale)
+			{
+				Time.timeScale = Mathf.Lerp(Time.timeScale, Level.slowMotionTimeScale, transitionTime * Time.deltaTime/Time.timeScale);//may cause weird behaviour
+				if (Time.timeScale < Level.slowMotionTimeScale)
+				{
+					Time.timeScale = Level.slowMotionTimeScale;
+				}
+				Time.fixedDeltaTime = 0.02F * Time.timeScale; //by default 30 times pr sec 0.02*1
+				yield return null;
+			}
 		}
 	}
 }
