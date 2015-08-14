@@ -9,18 +9,14 @@ public class SelectableLevel : MonoBehaviour
 	public GameObject PopupPanel;
 	Animator popupAnim;
 
-	public Color selectedColor;
 	public float selectMoveHeight, selectMoveSpeed;
 
 	Bridger.TransformData origin;
 	bool selected;
 
-	Renderer renderer;
-
 	void Awake()
 	{
 		origin = new Bridger.TransformData(transform);
-		renderer = GetComponent<Renderer>();
 		popupAnim = PopupPanel.GetComponent<Animator>();
 	}
 
@@ -38,10 +34,10 @@ public class SelectableLevel : MonoBehaviour
 	{
 		selected = true;
 		Debug.Log("yarp" + origin.localPosition);
-		StartCoroutine("SelectMove", origin.localPosition + Vector3.up*selectMoveHeight);
+		StopCoroutine("DeHighlight");
+		StartCoroutine("Highlight", origin.localPosition + Vector3.up*selectMoveHeight);
 		PopupPanel.SetActive(true);
 		popupAnim.SetBool("selected", selected);
-//		popupAnim.Play("Open");
 	}
 	public void DeSelect()
 	{
@@ -49,24 +45,17 @@ public class SelectableLevel : MonoBehaviour
 		if(selected)
 		{
 			selected = false;
-			StopCoroutine("SelectMove");
+			StopCoroutine("Highlight");
+			StartCoroutine("DeHighlight", origin.localPosition + Vector3.up*selectMoveHeight);
 			origin.Reload(transform);
 			popupAnim.SetBool("selected", selected);
 		}
 	}
 
-	IEnumerator SelectMove(Vector3 target)
+	IEnumerator Highlight(Vector3 target)
 	{
 		while(Vector3.Distance(transform.position, target) > 0.05f )
 		{
-			if(renderer != null)
-			{
-				renderer.material.color = Color.Lerp(
-					renderer.material.color, 
-					selectedColor, 
-					selectMoveSpeed * Time.deltaTime);
-			}
-
 			transform.position = Vector3.Lerp(
 				transform.position, 
 				target, 
@@ -81,6 +70,31 @@ public class SelectableLevel : MonoBehaviour
 				origin.localScale + Vector3.one * selectMoveHeight,
 				selectMoveSpeed * Time.deltaTime);
 
+			yield return null;
+		}
+	}
+	
+	IEnumerator DeHighlight()
+	{
+		Debug.Log(transform.position + " vs " + origin.localPosition );
+		while(Vector3.Distance(transform.position, origin.localPosition) > 0.05f )
+		{
+			transform.position = Vector3.Lerp(
+				transform.position, 
+				origin.localPosition, 
+				selectMoveSpeed * Time.deltaTime);
+
+			transform.rotation = Quaternion.Lerp(
+				transform.rotation, 
+				Quaternion.Euler(origin.localRotation),
+				selectMoveSpeed * Time.deltaTime);
+			
+			
+			transform.localScale = Vector3.Lerp(
+				transform.localScale, 
+				origin.localScale,
+				selectMoveSpeed * Time.deltaTime);
+			
 			yield return null;
 		}
 	}

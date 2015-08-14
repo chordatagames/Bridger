@@ -16,7 +16,7 @@ namespace Bridger
 		{
 			ch = GetComponent<ConstructionHandler>();
 			ch.partType = partMaterials[currentMaterial];
-			materialPreview.sprite = ConstructMaterialPreview(currentMaterial);
+			materialPreview.sprite = ConstructMaterialPreview();
 		}
 		void Update()
 		{
@@ -30,13 +30,12 @@ namespace Bridger
 			{
 				currentMaterial += ((currentMaterial < partMaterials.Length-1) ? 1 : -currentMaterial);
 				ch.partType = partMaterials[currentMaterial];
-//				materialPreview.sprite = ConstructMaterialPreview(currentMaterial);
+				materialPreview.sprite = ConstructMaterialPreview();
 			}
 		}
-		Sprite ConstructMaterialPreview(int index)
+		Sprite ConstructMaterialPreview()
 		{
-			//Sprite s = Sprite.Create(UnityEditor.AssetPreview.GetAssetPreview(availableMaterials.materialsObjects[currentMaterial]), new Rect(0, 0, 128, 128), Vector2.one * 0.5f);
-			return new Sprite();
+			return Sprite.Create(ch.partType.partPreviewTexture, new Rect(0,0,32,32), Vector2.zero);
 		}
 	}
 }
