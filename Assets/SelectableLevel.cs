@@ -19,14 +19,14 @@ public class SelectableLevel : MonoBehaviour
 
 	void Awake()
 	{
+		origin = new Bridger.TransformData(transform);
 		renderer = GetComponent<Renderer>();
 		popupAnim = PopupPanel.GetComponent<Animator>();
 	}
 
 	void Start()
 	{
-		PopupPanel.SetActive(false);
-		origin = new Bridger.TransformData(transform);
+
 	}
 
 	public void EnterLevel()
@@ -36,20 +36,22 @@ public class SelectableLevel : MonoBehaviour
 
 	public void Select()
 	{
-
+		selected = true;
+		Debug.Log("yarp" + origin.localPosition);
 		StartCoroutine("SelectMove", origin.localPosition + Vector3.up*selectMoveHeight);
 		PopupPanel.SetActive(true);
-		selected = true;
-		popupAnim.SetBool("selected",selected);
+		popupAnim.SetBool("selected", selected);
+//		popupAnim.Play("Open");
 	}
-	public void UnSelect()
+	public void DeSelect()
 	{
+		Debug.Log("narp");
 		if(selected)
 		{
+			selected = false;
 			StopCoroutine("SelectMove");
 			origin.Reload(transform);
-			selected = false;
-			popupAnim.SetBool(0,selected);
+			popupAnim.SetBool("selected", selected);
 		}
 	}
 
