@@ -12,8 +12,8 @@ namespace Bridger
 
 		public static IRevertable currentItem{ get{return undoStack.Peek();} }
 
-		static Stack<IRevertable> undoStack = new Stack<IRevertable>();
-		static Stack<IRevertable> redoStack = new Stack<IRevertable>();
+		public static Stack<IRevertable> undoStack = new Stack<IRevertable>();
+		public static Stack<IRevertable> redoStack = new Stack<IRevertable>();
 
 		public static void AddToLevel(IReloadable part)
 		{
@@ -54,7 +54,7 @@ namespace Bridger
 		{
 			if(undoStack.Count > 0)
 			{
-				if(undoStack.Peek().Undo())//Sucessfully undo
+				if(undoStack.Peek().Undo()) //Successfully undo
 				{
 					redoStack.Push(undoStack.Pop());
 				}
