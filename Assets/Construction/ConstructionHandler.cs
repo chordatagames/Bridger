@@ -10,7 +10,7 @@ namespace Bridger
 	public class ConstructionHandler : MonoBehaviour
 	{
 		public static ConstructionHandler instance;
-		public Canvas BuildUICanvas;
+		public GameObject jointBase;
 		public BridgePartType partType;
 		public ConstructionMode mode = ConstructionMode.BUILD;
 

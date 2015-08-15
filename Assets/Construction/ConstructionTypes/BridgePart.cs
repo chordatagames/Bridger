@@ -7,8 +7,6 @@ namespace Bridger
 	[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 	public class BridgePart : MonoBehaviour, IReloadable, IRevertable
 	{
-		Image bridgeJointUI;
-		static int partID = 0;
 		TransformData resetTransform;
 		public bool editing = true;
 		public BridgePartType materialType;
@@ -37,9 +35,6 @@ namespace Bridger
 			instance.rigid = instance.GetComponent<Rigidbody2D>();
 			instance.rigid.isKinematic = true;
 			instance.transform.position = (Vector3)instance.partOrigin;
-			instance.name += partID;
-			partID++;
-			Debug.Log("Instantiated new!");
 			return instance;
 		}
 
@@ -54,7 +49,6 @@ namespace Bridger
 		public void EndStrech()
 		{
 			editing = false;
-			Debug.Log("Ending " + name);
 			if(partLength < Grid.gridSize)
 			{
 				Destroy(gameObject);
@@ -69,15 +63,20 @@ namespace Bridger
 
 		GameObject CreateJointCollider(Vector2 position)
 		{
-//			Image bridgeJointUI = new GameObject(this.name + "jointUI").AddComponent<Image>();
+			GameObject joint = Instantiate<GameObject>(ConstructionHandler.instance.jointBase);
+			joint.transform.position = (Vector3)position + Vector3.back*9;
+			joint.transform.SetParent(transform, true);
+			joint.transform.localScale = Vector3.one*(Grid.gridSize*4.0f/partLength) + Vector3.up*8;
+			joint.transform.localRotation = Quaternion.identity;
 
-			GameObject go = new GameObject("joint");//TODO set UI sprite as well
-			go.AddComponent<CircleCollider2D>().radius = Grid.gridSize/4;
-			go.layer = 9; //JOINT
-			go.transform.position = (Vector3)position;
-			go.transform.SetParent(transform, true);
-			go.transform.localScale = Vector3.one*(Grid.gridSize*2.0f/partLength);
-			return go;
+
+//			GameObject go = new GameObject("joint");//TODO set UI sprite as well
+//			go.AddComponent<CircleCollider2D>().radius = Grid.gridSize/4;
+//			go.layer = 9; //JOINT
+//			go.transform.position = (Vector3)position;
+//			go.transform.SetParent(transform, true);
+//			go.transform.localScale = Vector3.one*(Grid.gridSize*2.0f/partLength);
+			return joint;
 		}
 
 		/// <summary>
@@ -109,10 +108,6 @@ namespace Bridger
 				bridgejoint.enabled = false;
 				bridgejoint.joint.enabled = false;
 			}
-			if(_connectedTo.Count == 1)
-			{
-//				bridgeJointUI.enabled = false;
-			}
 		}
 
 		public void DetachAll()//TODO rename function
@@ -122,7 +117,6 @@ namespace Bridger
 				bridgejoint.enabled = false;
 				bridgejoint.joint.enabled = false;
 			}
-//			bridgeJointUI.enabled = false;
 		}
 
 		public void Attach(BridgeJoint bridgejoint)
@@ -132,7 +126,6 @@ namespace Bridger
 				bridgejoint.enabled = true;
 				bridgejoint.joint.enabled = true;
 			}
-//			bridgeJointUI.enabled = true;
 		}
 
 		public void AttachAll()//TODO rename function
@@ -142,7 +135,6 @@ namespace Bridger
 				bridgejoint.enabled = true;
 				bridgejoint.joint.enabled = true;
 			}
-//			bridgeJointUI.enabled = true;
 		}
 
 		public void Reset()
