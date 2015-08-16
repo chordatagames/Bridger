@@ -108,14 +108,13 @@ namespace Bridger
 				if(Input.GetKeyDown(KeyCode.Z))
 				{
 					Level.Undo();
-					if (Level.undoStack.Peek() is BridgePart)
-						buildingPart = Level.undoStack.Peek() as BridgePart;
+					buildingPart = Level.undoStack.Peek() as BridgePart;
 				}
+
 				if(Input.GetKeyDown(KeyCode.R))
 				{
+					buildingPart = Level.redoStack.Peek() as BridgePart;
 					Level.Redo();
-					if (Level.redoStack.Peek() is BridgePart)
-						buildingPart = Level.redoStack.Peek() as BridgePart;
 				}
 			}
 		}
