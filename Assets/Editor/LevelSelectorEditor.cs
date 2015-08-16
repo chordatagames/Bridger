@@ -50,6 +50,26 @@ public class LevelSelectorEditor : Editor
 		Vector3 levelPoint = levelSelector.availableLevels[index].selectableLevel.transform.position;
 		Handles.DrawLine(levelSelector.availableLevels[index].position, levelPoint);
 
+		if(index < levelSelector.availableLevels.Length-3)
+		{
+			Handles.color = Color.blue;
+			Vector3 tangent = 
+				(levelSelector.availableLevels[index+1].position + levelSelector.availableLevels[index+2].position)/
+					(levelSelector.availableLevels[index].position + levelSelector.availableLevels[index+1].position).magnitude;
+			Handles.DrawBezier(
+				levelSelector.availableLevels[index].position,
+				levelSelector.availableLevels[index+1].position,
+				tangent, 
+				levelSelector.availableLevels[index+1].position - 
+				(levelSelector.availableLevels[index+2].position + levelSelector.availableLevels[index+3].position)/
+				(levelSelector.availableLevels[index+1].position + levelSelector.availableLevels[index+2].position).magnitude
+				, 
+				Color.blue, 
+				Texture2D.whiteTexture,
+				5f);
+		}
+
+
 		Handles.color = Color.black;
 
 		if (Handles.Button(levelPoint, handleRotation, handleSize, pickSize, Handles.DotCap)) {

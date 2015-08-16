@@ -58,6 +58,7 @@ namespace Bridger
 				{
 					DoConstruction();
 				}
+				DoCommands();
 				break;
 			case ConstructionMode.EREASE:
 				break;
@@ -66,7 +67,7 @@ namespace Bridger
 			default:
 				break;
 			}
-			DoCommands();
+
 		}
 
 		void DoConstruction()

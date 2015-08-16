@@ -17,20 +17,17 @@ public class LevelSelector : MonoBehaviour
 		int lastSelected = currentlySelected;
 		if(Input.GetKeyDown(KeyCode.LeftArrow))
 		{
-			Debug.Log("L");
 			currentlySelected--;
 			currentlySelected = Mathf.Clamp(currentlySelected,0,availableLevels.Length-1);
 		}
 		if(Input.GetKeyDown(KeyCode.RightArrow))
 		{
-			Debug.Log("R");
 			currentlySelected++;
 			currentlySelected = Mathf.Clamp(currentlySelected,0,availableLevels.Length-1);
 		}
 		if(lastSelected != currentlySelected)
 		{
 			availableLevels[lastSelected].selectableLevel.DeSelect();
-			Debug.Log("SSS");
 			GotoSelectableLevel();
 		}
 	}
