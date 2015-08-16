@@ -25,8 +25,9 @@ namespace Bridger
 		
 		void Start()
 		{
-		
+			materialType.LoadType(gameObject);
 		}
+
 		public static BridgePart Create(BridgePartType type, Vector2 position)
 		{
 			BridgePart instance = Instantiate<GameObject>(type.model).AddComponent<BridgePart>();
