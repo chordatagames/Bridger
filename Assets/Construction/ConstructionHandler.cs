@@ -153,5 +153,19 @@ namespace Bridger
 				yield return null;
 			}
 		}
+
+		IEnumerator UnSlowMotion(float transitionTime)
+		{
+			while(Time.timeScale != Level.slowMotionTimeScale)
+			{
+				Time.timeScale = Mathf.Lerp(Time.timeScale, Level.slowMotionTimeScale, transitionTime * Time.deltaTime/Time.timeScale);//may cause weird behaviour
+				if (Time.timeScale < Level.slowMotionTimeScale)
+				{
+					Time.timeScale = Level.slowMotionTimeScale;
+				}
+				Time.fixedDeltaTime = 0.02F * Time.timeScale; //by default 30 times pr sec 0.02*1
+				yield return null;
+			}
+		}
 	}
 }

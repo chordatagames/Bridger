@@ -14,12 +14,15 @@ public class LevelSelectorEditor : Editor
 	private Quaternion handleRotation;
 	private int selectedIndex = -1;
 
+	private Vector3[,]tangents;
+
 	void OnEnable()
 	{
 		levelSelector = target as LevelSelector;
 
 		handleTransform = levelSelector.transform;
 		handleRotation = Quaternion.identity;
+		tangents = new Vector3[levelSelector.availableLevels.Length,2];
 	}
 
 	public override void OnInspectorGUI ()
@@ -49,30 +52,53 @@ public class LevelSelectorEditor : Editor
 		Handles.SphereCap(index,levelSelector.availableLevels[index].position, Quaternion.identity,0.3f);
 		Vector3 levelPoint = levelSelector.availableLevels[index].selectableLevel.transform.position;
 		Handles.DrawLine(levelSelector.availableLevels[index].position, levelPoint);
+		
+		Handles.color = Color.blue;
 
-		if(index < levelSelector.availableLevels.Length-3)
+		if (Handles.Button(tangents[index,0], handleRotation, handleSize, pickSize, Handles.DotCap))
 		{
-			Handles.color = Color.blue;
-			Vector3 tangent = 
-				(levelSelector.availableLevels[index+1].position + levelSelector.availableLevels[index+2].position)/
-					(levelSelector.availableLevels[index].position + levelSelector.availableLevels[index+1].position).magnitude;
+			selectedIndex = index;
+		}
+
+		if (Handles.Button(tangents[index,1], handleRotation, handleSize, pickSize, Handles.DotCap))
+		{
+			selectedIndex = index;
+		}
+		Handles.DrawLine(levelSelector.availableLevels[index].position, tangents[index,0]);
+		Handles.DrawLine(levelSelector.availableLevels[index].position, tangents[index,1]);
+
+		if (selectedIndex == index)
+		{
+			EditorGUI.BeginChangeCheck();
+			tangents[index,0] = Handles.DoPositionHandle(tangents[index,0], handleRotation);
+			if (EditorGUI.EndChangeCheck()) 
+			{
+				//levelSelector.bezier operations
+			}
+			EditorGUI.BeginChangeCheck();
+			tangents[index,1] = Handles.DoPositionHandle(tangents[index,1], handleRotation);
+			if (EditorGUI.EndChangeCheck()) 
+			{
+				//levelSelector.bezier operations
+			}
+		}
+		
+		if(index < levelSelector.availableLevels.Length-1)
+		{
 			Handles.DrawBezier(
 				levelSelector.availableLevels[index].position,
 				levelSelector.availableLevels[index+1].position,
-				tangent, 
-				levelSelector.availableLevels[index+1].position - 
-				(levelSelector.availableLevels[index+2].position + levelSelector.availableLevels[index+3].position)/
-				(levelSelector.availableLevels[index+1].position + levelSelector.availableLevels[index+2].position).magnitude
-				, 
+				tangents[index,0],
+				tangents[index,1], 
 				Color.blue, 
 				Texture2D.whiteTexture,
 				5f);
 		}
-
-
+		
 		Handles.color = Color.black;
 
-		if (Handles.Button(levelPoint, handleRotation, handleSize, pickSize, Handles.DotCap)) {
+		if (Handles.Button(levelPoint, handleRotation, handleSize, pickSize, Handles.DotCap))
+		{
 			selectedIndex = index;
 		}
 

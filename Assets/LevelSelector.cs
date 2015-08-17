@@ -7,6 +7,8 @@ public class LevelSelector : MonoBehaviour
 	private int currentlySelected = 0;
 	public SelectableLevelCameraPoint[] availableLevels;
 
+	private Vector3[,]tangents;
+
 	void Start()
 	{
 		GotoSelectableLevel();
