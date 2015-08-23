@@ -13,6 +13,7 @@ namespace Bridger
 		public GameObject jointBase;
 		public BridgePartType partType;
 		public ConstructionMode mode = ConstructionMode.BUILD;
+		public LayerMask blocksConstruction;
 
 		Vector2 mousePosition{ get{return (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);} }
 		BridgePart buildingPart;
@@ -48,16 +49,18 @@ namespace Bridger
 				
 				List<RaycastResult> hits = new List<RaycastResult>();
 				EventSystem.current.RaycastAll( pe, hits );
+				
 				bool notUI = true;
 				
 				foreach (RaycastResult h in hits)
 				{
 					notUI &= (h.gameObject.layer != 5);//if all pass as other layers, notUI will remain true;
 				}
-				if (notUI)
+				if(notUI)
 				{
 					DoConstruction();
 				}
+
 				DoCommands();
 				break;
 			case ConstructionMode.EREASE:
@@ -72,30 +75,46 @@ namespace Bridger
 
 		void DoConstruction()
 		{
+			bool obstructed = false;
+			
+			Collider2D obstructingPart = Physics2D.OverlapPoint(
+				(buildingPart != null) ? ((buildingPart.editing) ? buildingPart.partEnd : mousePosition) : mousePosition,
+				blocksConstruction);
+
+			if(obstructingPart != null)
+			{
+				obstructed=true;
+			}
 
 			if(Input.GetMouseButtonDown(0))
 			{
+				if(!obstructed)
+				{
+					if(buildingPart != null) 
+					{
+						if(buildingPart.editing)
+						{buildingPart.EndStrech();}
+						buildingPart = BridgePart.Create(partType, (Input.GetKey(KeyCode.LeftShift) ? buildingPart.partEnd : mousePosition));
+					}
+					else
+					{
+						buildingPart = BridgePart.Create(partType, mousePosition);
+					}
+				}
 
-				if(buildingPart != null) 
-				{
-					if(buildingPart.editing)
-					{buildingPart.EndStrech();}
-					buildingPart = BridgePart.Create(partType, (Input.GetKey(KeyCode.LeftShift) ? buildingPart.partEnd : mousePosition));
-				}
-				else
-				{
-					buildingPart = BridgePart.Create(partType, mousePosition);
-				}
 			}
 			if(buildingPart != null)
 			{
-				if(Input.GetMouseButton(0))
+				if(buildingPart.editing)
 				{
 					buildingPart.Strech(mousePosition);
 				}
 				if(Input.GetMouseButtonUp(0))
 				{
-					buildingPart.EndStrech();
+					if(!obstructed)
+					{
+						buildingPart.EndStrech();
+					}
 				}
 			}
 			
