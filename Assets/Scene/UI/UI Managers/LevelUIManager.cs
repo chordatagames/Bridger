@@ -25,10 +25,6 @@ public class LevelUIManager: MonoBehaviour
 		Level.Redo();//Why was this Level.Undo() before, that's just stupid.
 	}
 
-	public void CompleteLevel()
-	{
-		Level.Complete();
-	}
 	public void LoadLevelSelection()
 	{
 		Level.CloseLevel();
@@ -39,4 +35,5 @@ public class LevelUIManager: MonoBehaviour
 	{
 		Level.UnSlowmo();
 	}
+
 }
