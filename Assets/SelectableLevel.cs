@@ -33,7 +33,6 @@ public class SelectableLevel : MonoBehaviour
 	public void Select()
 	{
 		selected = true;
-		Debug.Log("yarp" + origin.localPosition);
 		StopCoroutine("DeHighlight");
 		StartCoroutine("Highlight", origin.localPosition + Vector3.up*selectMoveHeight);
 		PopupPanel.SetActive(selected);
@@ -41,7 +40,6 @@ public class SelectableLevel : MonoBehaviour
 	}
 	public void DeSelect()
 	{
-		Debug.Log("narp");
 		if(selected)
 		{
 			selected = false;

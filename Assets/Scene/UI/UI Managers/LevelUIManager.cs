@@ -22,12 +22,21 @@ public class LevelUIManager: MonoBehaviour
 	}
 	public void Redo()
 	{
-		Level.Undo();
+		Level.Redo();//Why was this Level.Undo() before, that's just stupid.
+	}
+
+	public void CompleteLevel()
+	{
+		Level.Complete();
+	}
+	public void LoadLevelSelection()
+	{
+		Level.CloseLevel();
+		Application.LoadLevel("LevelMenu");
 	}
 
 	public void UnSlowmo()
 	{
 		Level.UnSlowmo();
 	}
-
 }

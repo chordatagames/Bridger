@@ -1,15 +1,43 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
-public class GoalController : MonoBehaviour {
+namespace Bridger
+{
+	public class GoalController : MonoBehaviour
+	{
+		public GoalZone[] goals;
+		private bool _completed;
+		public bool completed{ get{return _completed;} }
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+		public Animator completedAnimation;
+
+		void Update()
+		{
+			if(Level.mode == Level.LevelMode.PLAY)
+			{
+				_completed = !Level.completed; //this is to only make the level complete once, if not complete, temporarely set to true
+				Debug.Log(_completed);
+				foreach(GoalZone goal in goals)
+				{
+					_completed &= goal.completed;
+				}
+
+				if(_completed)
+				{
+					CompleteLevel();
+				}
+			}
+		}
+
+		public void CompleteLevel()
+		{
+			Level.Complete();
+			if(completedAnimation != null)
+			{
+				completedAnimation.SetBool("open", _completed);
+			}
+
+		}
 	}
 }

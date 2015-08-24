@@ -12,20 +12,11 @@ namespace Bridger
 		public static ConstructionHandler instance;
 		public GameObject jointBase;
 		public BridgePartType partType;
-		public ConstructionMode mode = ConstructionMode.BUILD;
 		public LayerMask blocksConstruction;
 
 		Vector2 mousePosition{ get{return (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);} }
 		BridgePart buildingPart;
 		BridgePart lastPart;
-
-		public enum ConstructionMode
-		{
-			BUILD,
-			EREASE,
-			MODIFY,
-			PLAY
-		}
 
 		void Awake()
 		{
@@ -41,9 +32,9 @@ namespace Bridger
 
 		void Update()
 		{
-			switch (mode)
+			switch (Level.mode)
 			{
-			case ConstructionMode.BUILD:
+			case Level.LevelMode.BUILD:
 				PointerEventData pe = new PointerEventData(EventSystem.current);
 				pe.position = Input.mousePosition;
 				
@@ -62,10 +53,6 @@ namespace Bridger
 				}
 
 				DoCommands();
-				break;
-			case ConstructionMode.EREASE:
-				break;
-			case ConstructionMode.MODIFY:
 				break;
 			default:
 				break;
@@ -137,16 +124,7 @@ namespace Bridger
 				}
 			}
 		}
-
-		public void PlayMode()
-		{
-			mode = ConstructionMode.PLAY;
-		}
-		public void BuildMode()
-		{
-			mode = ConstructionMode.BUILD;
-		}
-
+		
 		public void SlowMo(float transitionTime)
 		{
 			StartCoroutine("SlowMotion", transitionTime);

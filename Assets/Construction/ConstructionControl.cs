@@ -20,12 +20,12 @@ namespace Bridger
 		}
 		void Update()
 		{
-			if(Input.GetKeyDown(KeyCode.X))
-			{
-				ch.mode = (ch.mode == ConstructionHandler.ConstructionMode.BUILD) ? 
-						ConstructionHandler.ConstructionMode.EREASE :
-						ConstructionHandler.ConstructionMode.BUILD;
-			}
+//			if(Input.GetKeyDown(KeyCode.X))
+//			{
+//				ch.mode = (ch.mode == ConstructionHandler.ConstructionMode.BUILD) ? 
+//						ConstructionHandler.ConstructionMode.EREASE :
+//						ConstructionHandler.ConstructionMode.BUILD;
+//			}
 			if(Input.GetMouseButtonDown(1))//RightClick
 			{
 				currentMaterial += ((currentMaterial < partMaterials.Length-1) ? 1 : -currentMaterial);
