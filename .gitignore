@@ -1,3 +1,5 @@
+*_[Dd]ata/
+
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -65,3 +67,6 @@ $RECYCLE.BIN/
 
 # Windows executables
 *.exe
+
+# Windows program debugging database
+*.pdb
