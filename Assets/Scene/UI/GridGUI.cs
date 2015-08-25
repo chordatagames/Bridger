@@ -56,21 +56,21 @@ public class GridGUI : MonoBehaviour
 		// end grid
 
 		// begin border - i wish there was a better way to do this.
-//		Rect bounds = GameController.control.level.levelBounds;
-//		GL.Color(Color.red);
-//		
-//		// they have to be done like this because they need to be above the grid.
-//		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y, -1));
-//		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y + bounds.size.y, -1));
-//
-//		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y + bounds.size.y, -1));
-//		GL.Vertex(new Vector3(bounds.position.x + bounds.size.x, bounds.position.y + bounds.size.y, -1));
-//
-//		GL.Vertex(new Vector3(bounds.position.x + bounds.size.x, bounds.position.y + bounds.size.y, -1));
-//		GL.Vertex(new Vector3(bounds.position.x + bounds.size.x, bounds.position.y, -1));
-//
-//		GL.Vertex(new Vector3(bounds.position.x + bounds.size.x, bounds.position.y, -1));
-//		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y, -1));
+		Rect bounds = Bridger.ConstructionHandler.instance.constructionBorder;
+		GL.Color(Color.red);
+		
+		// they have to be done like this because they need to be above the grid. bleh
+		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y, -1));
+		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y + bounds.size.y, -1));
+
+		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y + bounds.size.y, -1));
+		GL.Vertex(new Vector3(bounds.position.x + bounds.size.x, bounds.position.y + bounds.size.y, -1));
+
+		GL.Vertex(new Vector3(bounds.position.x + bounds.size.x, bounds.position.y + bounds.size.y, -1));
+		GL.Vertex(new Vector3(bounds.position.x + bounds.size.x, bounds.position.y, -1));
+
+		GL.Vertex(new Vector3(bounds.position.x + bounds.size.x, bounds.position.y, -1));
+		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y, -1));
 		// end border
 
 		GL.End();

@@ -13,6 +13,7 @@ namespace Bridger
 		public GameObject jointBase;
 		public BridgePartType partType;
 		public LayerMask blocksConstruction;
+		public Rect constructionBorder;
 
 		Vector2 mousePosition{ get{return (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);} }
 		BridgePart buildingPart;
@@ -62,20 +63,14 @@ namespace Bridger
 
 		void DoConstruction()
 		{
-			bool obstructed = false;
-			
-			Collider2D obstructingPart = Physics2D.OverlapPoint(
+			bool obstructed = Physics2D.OverlapPoint(
 				(buildingPart != null) ? ((buildingPart.editing) ? buildingPart.partEnd : mousePosition) : mousePosition,
-				blocksConstruction);
-
-			if(obstructingPart != null)
-			{
-				obstructed=true;
-			}
+				blocksConstruction
+			) != null; // this is a work of art and i refuse to hear otherwise
 
 			if(Input.GetMouseButtonDown(0))
 			{
-				if(!obstructed)
+				if(!obstructed && constructionBorder.Contains(mousePosition))
 				{
 					if(buildingPart != null) 
 					{
@@ -98,7 +93,7 @@ namespace Bridger
 				}
 				if(Input.GetMouseButtonUp(0))
 				{
-					if(!obstructed)
+					if(!obstructed && constructionBorder.Contains(mousePosition))
 					{
 						buildingPart.EndStrech();
 					}
