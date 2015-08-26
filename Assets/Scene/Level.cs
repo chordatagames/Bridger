@@ -6,10 +6,6 @@ namespace Bridger
 	public static class Level
 	{
 		public const float slowMotionTimeScale = 0.075f; //7.5%
-		static float slowTimeSpeed = 1.25f;
-
-		private static bool _completed = false;
-		public static bool completed{ get{return _completed;} }
 
 		public enum LevelMode
 		{
@@ -17,16 +13,15 @@ namespace Bridger
 			PLAY
 		}
 
+		public static bool completed = false;
 		public static LevelMode mode = LevelMode.BUILD;
-
-		static List<IReloadable> levelObjects = new List<IReloadable>();
-
 		public static List<GoalZone> levelGoals = new List<GoalZone>();
-
 		public static IRevertable currentItem{ get{return undoStack.Peek();} }
-
 		public static Stack<IRevertable> undoStack = new Stack<IRevertable>();
 		public static Stack<IRevertable> redoStack = new Stack<IRevertable>();
+
+		static List<IReloadable> levelObjects = new List<IReloadable>();
+		static float slowTimeSpeed = 1.25f;
 
 		public static void AddToLevel(IReloadable part)
 		{
@@ -48,7 +43,11 @@ namespace Bridger
 		}
 		public static void Reload()
 		{
-			_completed = false;
+			completed = false;
+			foreach (GoalZone goal in levelGoals)
+			{
+				goal.completed = false;
+			}
 			mode = LevelMode.BUILD;
 			foreach(IReloadable part in levelObjects)
 			{
@@ -96,15 +95,10 @@ namespace Bridger
 		{
 			ConstructionHandler.instance.UnSlowMo();
 		}
-
-		public static void Complete()
-		{
-			_completed = true;
-		}
 		public static void CloseLevel()
 		{
 			mode = LevelMode.BUILD;
-			_completed = false;
+			completed = false;
 			levelObjects.Clear();
 			undoStack.Clear();
 			redoStack.Clear();

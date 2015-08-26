@@ -7,8 +7,7 @@ namespace Bridger
 	public class GoalController : MonoBehaviour
 	{
 		public GoalZone[] goals;
-		private bool _completed;
-		public bool completed{ get{return _completed;} }
+		public bool completed;
 
 		public Animator completedAnimation;
 
@@ -16,26 +15,21 @@ namespace Bridger
 		{
 			if(Level.mode == Level.LevelMode.PLAY)
 			{
-				_completed = !Level.completed; //this is to only make the level complete once, if not complete, temporarely set to true
-				Debug.Log(_completed);
+				completed = !Level.completed; //this is to only make the level complete once, if not complete, temporarely set to true
 				foreach(GoalZone goal in goals)
 				{
-					_completed &= goal.completed;
+					completed &= goal.completed;
 				}
 
-				if(_completed)
+				if(completed)
 				{
-					CompleteLevel();
+					Level.completed = true;
 				}
-			}
-		}
 
-		public void CompleteLevel()
-		{
-			Level.Complete();
-			if(completedAnimation != null)
-			{
-				completedAnimation.SetBool("open", _completed);
+				if(completedAnimation != null)
+				{
+					completedAnimation.SetBool("open", Level.completed);
+				}
 			}
 
 		}
