@@ -5,11 +5,31 @@ using System.Collections.Generic;
 
 namespace Bridger
 {
-//TODO add object pooling from a "Level"-class
-	[RequireComponent(typeof(DontLoadDestroy))]
+
+	[RequireComponent(typeof(DontLoadDestroy), typeof(ConstructionControl))]
 	public class ConstructionHandler : MonoBehaviour
 	{
-		public static ConstructionHandler instance;
+		//Some sort of singleton control
+		private static ConstructionHandler _instance;
+		public static ConstructionHandler instance{get{return _instance;}}
+
+		private static ConstructionControl _materialControl;
+		public static ConstructionControl materialControl{get{return _materialControl;}}
+
+		void Awake()
+		{
+			if(_instance != null && _instance != this)
+			{
+				Destroy(this);
+			}
+			else
+			{
+				_instance = this;
+				_materialControl = GetComponent<ConstructionControl>();
+			}
+		}
+
+
 		public GameObject jointBase;
 		public BridgePartType partType;
 		public LayerMask blocksConstruction;
@@ -19,87 +39,18 @@ namespace Bridger
 		BridgePart buildingPart;
 		BridgePart lastPart;
 
-		void Awake()
-		{
-			if(instance != null && instance != this)
-			{
-				Destroy(this);
-			}
-			else
-			{
-				instance = this;
-			}
-		}
 
 		void Update()
 		{
 			switch (Level.mode)
 			{
 			case Level.LevelMode.BUILD:
-				PointerEventData pe = new PointerEventData(EventSystem.current);
-				pe.position = Input.mousePosition;
-				
-				List<RaycastResult> hits = new List<RaycastResult>();
-				EventSystem.current.RaycastAll( pe, hits );
-				
-				bool notUI = true;
-				
-				foreach (RaycastResult h in hits)
-				{
-					notUI &= (h.gameObject.layer != 5);//if all pass as other layers, notUI will remain true;
-				}
-				if(notUI)
-				{
-					DoConstruction();
-				}
-
 				DoCommands();
 				break;
 			default:
 				break;
 			}
 
-		}
-
-		void DoConstruction()
-		{
-			bool obstructed = Physics2D.OverlapPoint(
-				(buildingPart != null) ? ((buildingPart.editing) ? buildingPart.partEnd : mousePosition) : mousePosition,
-				blocksConstruction
-			) != null; // this is a work of art and i refuse to hear otherwise
-
-			if(Input.GetMouseButtonDown(0))
-			{
-				if(!obstructed && constructionBorder.Contains(mousePosition))
-				{
-					if(buildingPart != null) 
-					{
-						if(buildingPart.editing)
-						{buildingPart.EndStrech();}
-						buildingPart = BridgePart.Create(partType, (Input.GetKey(KeyCode.LeftShift) ? buildingPart.partEnd : mousePosition));
-					}
-					else
-					{
-						buildingPart = BridgePart.Create(partType, mousePosition);
-					}
-				}
-
-			}
-			if(buildingPart != null)
-			{
-				if(buildingPart.editing)
-				{
-					buildingPart.Strech(mousePosition);
-				}
-				if(Input.GetMouseButtonUp(0))
-				{
-					if(!obstructed && constructionBorder.Contains(mousePosition))
-					{
-						buildingPart.EndStrech();
-					}
-				}
-			}
-			
 		}
 
 		void DoCommands()
@@ -158,6 +109,16 @@ namespace Bridger
 				Time.fixedDeltaTime = 0.02F * Time.timeScale; //by default 30 times pr sec 0.02*1
 				yield return null;
 			}
+		}
+
+		void OnDrawGizmos()
+		{
+			Gizmos.color = Color.red;
+			Gizmos.DrawLine((Vector3)constructionBorder.min, new Vector3(constructionBorder.xMax, constructionBorder.yMin));
+			Gizmos.DrawLine(new Vector3(constructionBorder.xMax, constructionBorder.yMin), (Vector3)constructionBorder.max);
+			Gizmos.DrawLine((Vector3)constructionBorder.max, new Vector3(constructionBorder.xMin, constructionBorder.yMax));
+			Gizmos.DrawLine(new Vector3(constructionBorder.xMin, constructionBorder.yMax), (Vector3)constructionBorder.min);
+
 		}
 	}
 }

@@ -1,41 +1,62 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 namespace Bridger
 {
+	
 	public class ConstructionControl : MonoBehaviour
 	{
-		ConstructionHandler ch;
-		public Image materialPreview;
+		public Image materialPreview;//TODO move somewhere else.
 
+		public static ConstructionControl materialControl{get{return ConstructionHandler.materialControl;}}
 		public BridgePartType[] partMaterials;
-		int currentMaterial = 0;
-		
+		public BridgePartType currentMaterial{get{return partMaterials[currentMaterialIndex];} }
+		int currentMaterialIndex = 0;
+
+		public RectTransform materialSelection;
+
+		float mouseDownTime = 0.0f, desiredMouseDownTime = 5.0f;
+
 		void Start()
 		{
-			ch = GetComponent<ConstructionHandler>();
-			ch.partType = partMaterials[currentMaterial];
-			materialPreview.sprite = ConstructMaterialPreview();
+			ConstructionHandler.instance.partType = partMaterials[currentMaterialIndex];
+			materialSelection = Instantiate<RectTransform>(materialSelection);
 		}
+
 		void Update()
 		{
-//			if(Input.GetKeyDown(KeyCode.X))
-//			{
-//				ch.mode = (ch.mode == ConstructionHandler.ConstructionMode.BUILD) ? 
-//						ConstructionHandler.ConstructionMode.EREASE :
-//						ConstructionHandler.ConstructionMode.BUILD;
-//			}
+
 			if(Input.GetMouseButtonDown(1))//RightClick
 			{
-				currentMaterial += ((currentMaterial < partMaterials.Length-1) ? 1 : -currentMaterial);
-				ch.partType = partMaterials[currentMaterial];
-				materialPreview.sprite = ConstructMaterialPreview();
+				ResetMaterialSelection();
+//				currentMaterialIndex += ((currentMaterialIndex < partMaterials.Length-1) ? 1 : -currentMaterialIndex);
+//				ConstructionHandler.instance.partType = partMaterials[currentMaterialIndex];
+				if(mouseDownTime >= desiredMouseDownTime)
+				{
+					OpenMaterialSelection();
+				}
+				desiredMouseDownTime += Time.deltaTime;
+			}
+			else
+			{
+				mouseDownTime = 0;
 			}
 		}
+
+		void OpenMaterialSelection()
+		{	
+			materialSelection.gameObject.SetActive(true);
+		}
+		void ResetMaterialSelection()
+		{
+			materialSelection.gameObject.SetActive(false);
+		}
+
 		Sprite ConstructMaterialPreview()
 		{
-			return Sprite.Create(ch.partType.partPreviewTexture, new Rect(0,0,32,32), Vector2.zero);
+			return Sprite.Create(currentMaterial.partPreviewTexture, new Rect(0,0,32,32), Vector2.zero);
 		}
 	}
 }

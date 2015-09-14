@@ -27,7 +27,7 @@ public class LevelUIManager: MonoBehaviour
 
 	public void LoadLevelSelection()
 	{
-		Level.CloseLevel();
+		Level.ResetLevel();
 		Application.LoadLevel("LevelMenu");
 	}
 

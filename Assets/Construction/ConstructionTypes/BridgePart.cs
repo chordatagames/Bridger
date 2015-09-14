@@ -14,40 +14,47 @@ namespace Bridger
 		private Rigidbody2D rigid;
 
 		private Vector2 _partOrigin;
-		public Vector2 partOrigin 	{ get{return _partOrigin;} private set{_partOrigin = value;} }
-		public Vector2 partEnd 		{ get{return Grid.ToGrid(transform.position + transform.right * partLength/2);} }
+		public Vector2 partOrigin { get{return _partOrigin;} private set{_partOrigin = value;} }
+
+		private Vector2 _partEnd;
+		public Vector2 partEnd { get{return _partEnd;} private set{_partEnd = value;} }
 
 		public float partLength	{ get{return transform.localScale.x;} }
 		public float partMass	{ get{return partLength * materialType.massPerLength;} }
 
 		public BridgeJoint[] connectedTo{ get {return _connectedTo.ToArray();} }
 		List<BridgeJoint> _connectedTo = new List<BridgeJoint>();
-		
-		void Start()
-		{
-			materialType.LoadType(gameObject);
-		}
 
 		public static BridgePart Create(BridgePartType type, Vector2 position)
 		{
 			BridgePart instance = Instantiate<GameObject>(type.model).AddComponent<BridgePart>();
+
 			instance.partOrigin = Grid.ToGrid(position);
+			instance.partEnd = Grid.ToGrid(position);
+			instance.transform.position = (Vector3)instance.partOrigin;
+
 			instance.materialType = type;
+			instance.materialType.LoadType(instance.gameObject);
+
 			instance.rigid = instance.GetComponent<Rigidbody2D>();
 			instance.rigid.isKinematic = true;
-			instance.transform.position = (Vector3)instance.partOrigin;
 			return instance;
 		}
 
-		public void Strech(Vector2 strech)
+		public void StartStretch()
 		{
 			editing = true;
-			Vector2 relation = Grid.ToGrid (Vector2.ClampMagnitude (strech - partOrigin, materialType.maxLength));
+			Stretch(partOrigin);
+		}
+		public void Stretch(Vector2 stretch)
+		{
+			Vector2 relation = Grid.ToGrid (Vector2.ClampMagnitude (stretch - partOrigin, materialType.maxLength));
 			transform.position = (partOrigin + relation / 2);
 			transform.rotation = Quaternion.AngleAxis (Angles.Angle (Vector2.right, relation, false), Vector3.forward);
 			transform.localScale = new Vector3 (relation.magnitude, 0.25f, 2);
 		}
-		public void EndStrech()
+
+		public void EndStretch()
 		{
 			editing = false;
 			if(partLength < Grid.gridSize)
@@ -55,6 +62,9 @@ namespace Bridger
 				Destroy(gameObject);
 				return;
 			}
+
+			partEnd = Grid.ToGrid(transform.position + transform.right * partLength/2);
+
 			SetupJoint(partOrigin);
 			SetupJoint(partEnd);
 			rigid.mass = partMass;

@@ -11,14 +11,6 @@ namespace Bridger
 		private static bool _completed = false;
 		public static bool completed{ get{return _completed;} }
 
-		public enum LevelMode
-		{
-			BUILD,
-			PLAY
-		}
-
-		public static LevelMode mode = LevelMode.BUILD;
-
 		static List<IReloadable> levelObjects = new List<IReloadable>();
 
 		public static List<GoalZone> levelGoals = new List<GoalZone>();
@@ -27,6 +19,14 @@ namespace Bridger
 
 		public static Stack<IRevertable> undoStack = new Stack<IRevertable>();
 		public static Stack<IRevertable> redoStack = new Stack<IRevertable>();
+
+		public enum LevelMode
+		{
+			BUILD,
+			PLAY
+		}
+		
+		public static LevelMode mode = LevelMode.BUILD;
 
 		public static void AddToLevel(IReloadable part)
 		{
@@ -101,7 +101,7 @@ namespace Bridger
 		{
 			_completed = true;
 		}
-		public static void CloseLevel()
+		public static void ResetLevel()
 		{
 			mode = LevelMode.BUILD;
 			_completed = false;
