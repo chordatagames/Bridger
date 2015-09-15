@@ -14,6 +14,7 @@ namespace Bridger
 		public BridgePartType partType;
 		public LayerMask blocksConstruction;
 		public Rect constructionBorder;
+		public AudioSource audioSource;
 
 		Vector2 mousePosition{ get{return (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);} }
 		BridgePart buildingPart;
@@ -75,13 +76,18 @@ namespace Bridger
 					if(buildingPart != null) 
 					{
 						if(buildingPart.editing)
-						{buildingPart.EndStrech();}
+						{
+							buildingPart.EndStrech();
+						}
 						buildingPart = BridgePart.Create(partType, (Input.GetKey(KeyCode.LeftShift) ? buildingPart.partEnd : mousePosition));
 					}
 					else
 					{
 						buildingPart = BridgePart.Create(partType, mousePosition);
 					}
+					audioSource.pitch = Random.Range(0.3f,0.7f); // these are magic numbers, but who cares
+					audioSource.clip = partType.placementSound;
+					audioSource.Play();
 				}
 
 			}

@@ -36,6 +36,7 @@ namespace Bridger
 			instance.rigid = instance.GetComponent<Rigidbody2D>();
 			instance.rigid.isKinematic = true;
 			instance.transform.position = (Vector3)instance.partOrigin;
+			AudioSource.PlayClipAtPoint(type.placementSound,Camera.main.transform.position);
 			return instance;
 		}
 
