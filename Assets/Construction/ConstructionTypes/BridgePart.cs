@@ -7,7 +7,8 @@ namespace Bridger
 	[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 	public class BridgePart : MonoBehaviour, IReloadable, IRevertable
 	{
-		TransformData resetTransform;
+		public static bool showStress = false;
+
 		public bool editing = true;
 		public BridgePartType materialType;
 
@@ -20,12 +21,29 @@ namespace Bridger
 		public float partLength	{ get{return transform.localScale.x;} }
 		public float partMass	{ get{return partLength * materialType.massPerLength;} }
 
-		public BridgeJoint[] connectedTo{ get {return _connectedTo.ToArray();} }
+		public BridgeJoint[] connectedTo { get {return _connectedTo.ToArray();} }
 		List<BridgeJoint> _connectedTo = new List<BridgeJoint>();
-		
+
+		TransformData resetTransform;
+
 		void Start()
 		{
 			materialType.LoadType(gameObject);
+		}
+
+		void Update()
+		{
+			if (showStress)
+			{
+				// get average stress
+				float sum = 0;
+				foreach (BridgeJoint bridgeJoint in connectedTo)
+				{
+					sum += bridgeJoint.joint.GetReactionForce(Time.deltaTime).magnitude;
+				}
+				float average = sum / connectedTo.Length;
+				gameObject.GetComponent<Renderer>().material.color = new Color((1f/5f)*average,1-(1f/5f)*average,0);
+			}
 		}
 
 		public static BridgePart Create(BridgePartType type, Vector2 position)
@@ -36,7 +54,6 @@ namespace Bridger
 			instance.rigid = instance.GetComponent<Rigidbody2D>();
 			instance.rigid.isKinematic = true;
 			instance.transform.position = (Vector3)instance.partOrigin;
-			AudioSource.PlayClipAtPoint(type.placementSound,Camera.main.transform.position);
 			return instance;
 		}
 

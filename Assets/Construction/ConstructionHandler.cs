@@ -105,7 +105,6 @@ namespace Bridger
 					}
 				}
 			}
-			
 		}
 
 		void DoCommands()
