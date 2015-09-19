@@ -20,10 +20,17 @@ public class LowPolyMeshEditor : Editor
 			lowPolyMesh.CreateMesh();
 		}
 		base.OnInspectorGUI ();
-		
-		if(GUILayout.Button("ReloadColors"))
+		EditorGUILayout.LabelField("Resolution: " + lowPolyMesh.resolution);
+		if(lowPolyMesh.validMesh)
 		{
-			lowPolyMesh.ReloadColor();
+			if(GUILayout.Button("ReloadColors"))
+			{
+				lowPolyMesh.ReloadColor();
+			}
+		}
+		else
+		{
+			EditorGUILayout.HelpBox("Mesh data is lost, regenerate the mesh to modify!", MessageType.Info, true);
 		}
 	}
 	
