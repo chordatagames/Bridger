@@ -6,26 +6,41 @@ using System.Collections.Generic;
 public class LevelCreator : ScriptableWizard
 {
 	const float levelDepth = 16f;
-	public float 
-		gapSize = 5.0f,
-		gapHeight = 5.0f,
-		gapHeightDelta = 0.0f;
+
+	public float
+		gapSize,
+		gapHeight,
+		gapHeightDelta;
+	public bool
+		placeJointPoints;
 
 	private Transform
 		level,
 		floor,
 		wall_L,
 		wall_R;
-	static private Transform groundPrefab;
+	static private Transform
+		groundPrefab,
+		jointPointPrefab;
 
 	[MenuItem ("Bridger/Create Level")]
 	static void CreateWizard ()
 	{
 		groundPrefab = AssetDatabase.LoadAssetAtPath<Transform>("Assets/Level Creation/Ground.prefab") as Transform;
-		ScriptableWizard.DisplayWizard<LevelCreator>("Create Level", "Create", "Apply");
+		jointPointPrefab = AssetDatabase.LoadAssetAtPath<Transform>("Assets/Level Creation/JointPoint.prefab") as Transform;
+		ScriptableWizard.DisplayWizard<LevelCreator>("Create Level", "Create");
 	}
 	
 	void OnWizardCreate ()
+	{
+		DoLevelObject ();
+		CreateFeatures ();
+		ApplyValues();
+		if (placeJointPoints)
+			PlaceJointPoints();
+	}
+
+	void DoLevelObject ()
 	{
 		if (GameObject.Find ("LEVEL") == null)
 		{
@@ -35,30 +50,20 @@ public class LevelCreator : ScriptableWizard
 		{
 			level = GameObject.Find ("LEVEL").transform;
 		}
+	}
 
-		floor = GameObject.Instantiate(groundPrefab);
-		floor.name = "FLOOR";
-		floor.parent = level;
+	void CreateFeatures ()
+	{
+		CreateFeature (out floor, "Floor");
+		CreateFeature (out wall_L, "Start");
+		CreateFeature (out wall_R, "End");
+	}
 
-		wall_L = GameObject.Instantiate(groundPrefab);
-		wall_L.name = "WALL_L";
-		wall_L.parent = level;
-
-		wall_R = GameObject.Instantiate(groundPrefab);
-		wall_R.name = "WALL_R";
-		wall_R.parent = level;
-
-		ApplyValues();
-		
-		DeScaleJoints (floor);
-		DeScaleJoints (wall_L);
-		DeScaleJoints (wall_R);
-		
-		Undo.IncrementCurrentGroup ();
-		Undo.RegisterCreatedObjectUndo (floor, "");
-		Undo.RegisterCreatedObjectUndo (wall_L, "");
-		Undo.RegisterCreatedObjectUndo (wall_R, "");
-		Undo.SetCurrentGroupName ("level creation");
+	void CreateFeature (out Transform feature, string name)
+	{
+		feature = GameObject.Instantiate(groundPrefab);
+		feature.name = name;
+		feature.parent = level;
 	}
 
 	void ApplyValues()
@@ -73,40 +78,26 @@ public class LevelCreator : ScriptableWizard
 		wall_R.transform.localPosition = level.right * 0.5f * (gapSize + levelDepth) + level.up * gapHeightDelta * 0.5f;
 	}
 
+	void PlaceJointPoints()
+	{
+		Vector3 jointPosition;
+		Transform joint;
+
+		jointPosition = new Vector3 (-gapSize * 0.5f, gapHeight, -levelDepth/2 - 0.03f);
+		joint = (Transform) GameObject.Instantiate(jointPointPrefab, jointPosition, Quaternion.identity);
+		joint.parent = wall_L;
+		joint.name = "JointPoint";
+		
+		jointPosition = new Vector3 (gapSize * 0.5f, gapHeight + gapHeightDelta, -levelDepth/2 - 0.03f);
+		joint = (Transform) GameObject.Instantiate(jointPointPrefab, jointPosition, Quaternion.identity);
+		joint.parent = wall_R;
+		joint.name = "JointPoint";
+	}
+
 	void OnWizardUpdate ()
 	{
 		gapSize -= (gapSize % Grid.gridSize);
 		gapSize += ((gapSize % Grid.gridSize > Grid.gridSize * 0.5f) ? -Grid.gridSize : 0);
 		gapHeightDelta = Mathf.Clamp(gapHeightDelta, -gapHeight + Grid.gridSize, gapHeightDelta);
-	}
-	
-	// When the user pressed the "Apply" button OnWizardOtherButton is called.
-	void OnWizardOtherButton () 
-	{
-		level = Selection.activeTransform;
-		if(level != null)
-		{
-			if(level.name.Equals("LEVEL"))
-			{
-				floor = level.FindChild("FLOOR");
-				wall_L = level.FindChild("WALL_L");
-				wall_R = level.FindChild("WALL_R");
-
-				ApplyValues();
-			}
-		}
-	}
-
-	void DeScaleJoints(Transform jointParent)
-	{
-		Vector3 inverseParentScale = new Vector3 (1.00f / jointParent.localScale.x, 1.00f / jointParent.localScale.y, 1.00f / jointParent.localScale.z);
-
-		foreach (Transform c in jointParent)
-		{
-			if (c.name == "JointPoint")
-			{
-				c.localScale = Vector3.Scale(c.localScale, inverseParentScale);
-			}
-		}
 	}
 }
