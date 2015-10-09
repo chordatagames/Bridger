@@ -8,11 +8,12 @@ public class LevelCreator : ScriptableWizard
 	const float levelDepth = 16f;
 
 	public float
-		gapSize,
-		gapHeight,
-		gapHeightDelta;
+		gapSize = 5,
+		gapHeight = 5,
+		gapHeightDelta = 2,
+		goalX = 30;
 	public bool
-		placeJointPoints;
+		placeJointPoints = true;
 
 	private Transform
 		level,
@@ -21,13 +22,19 @@ public class LevelCreator : ScriptableWizard
 		wall_R;
 	static private Transform
 		groundPrefab,
-		jointPointPrefab;
+		jointPointPrefab,
+		carPrefab,
+		constructionHandlerPrefab,
+		eventSystemPrefab,
+		goalsPrefab,
+		isometricCameraPrefab,
+		mainCameraPrefab,
+		UIManagerPrefab;
 
 	[MenuItem ("Bridger/Create Level")]
 	static void CreateWizard ()
 	{
-		groundPrefab = AssetDatabase.LoadAssetAtPath<Transform>("Assets/Level Creation/Ground.prefab") as Transform;
-		jointPointPrefab = AssetDatabase.LoadAssetAtPath<Transform>("Assets/Level Creation/JointPoint.prefab") as Transform;
+		ImportPrefabs();
 		ScriptableWizard.DisplayWizard<LevelCreator>("Create Level", "Create");
 	}
 	
@@ -38,6 +45,7 @@ public class LevelCreator : ScriptableWizard
 		ApplyValues();
 		if (placeJointPoints)
 			PlaceJointPoints();
+		SetupLevelNecessities();
 	}
 
 	void DoLevelObject ()
@@ -61,9 +69,11 @@ public class LevelCreator : ScriptableWizard
 
 	void CreateFeature (out Transform feature, string name)
 	{
+		Transform groundContainer = new GameObject(name).transform;
+		groundContainer.parent = level;
+
 		feature = GameObject.Instantiate(groundPrefab);
-		feature.name = name;
-		feature.parent = level;
+		feature.parent = groundContainer;
 	}
 
 	void ApplyValues()
@@ -99,5 +109,72 @@ public class LevelCreator : ScriptableWizard
 		gapSize -= (gapSize % Grid.gridSize);
 		gapSize += ((gapSize % Grid.gridSize > Grid.gridSize * 0.5f) ? -Grid.gridSize : 0);
 		gapHeightDelta = Mathf.Clamp(gapHeightDelta, -gapHeight + Grid.gridSize, gapHeightDelta);
+	}
+
+	static void ImportPrefabs()
+	{
+		ImportPrefab(out groundPrefab, "Ground");
+		ImportPrefab(out jointPointPrefab, "JointPoint");
+		ImportPrefab(out carPrefab, "EL CAR");
+		ImportPrefab(out constructionHandlerPrefab, "Construction Handler");
+		ImportPrefab(out eventSystemPrefab, "EventSystem");
+		ImportPrefab(out goalsPrefab, "Goals");
+		ImportPrefab(out isometricCameraPrefab, "IsoCam Full");
+		ImportPrefab(out mainCameraPrefab, "Main Camera");
+		ImportPrefab(out UIManagerPrefab, "UI Manager");
+	}
+
+	static void ImportPrefab(out Transform prefab, string name)
+	{
+		prefab = AssetDatabase.LoadAssetAtPath<Transform>("Assets/Level Creation/" + name + ".prefab") as Transform;
+	}
+
+	void SetupLevelNecessities ()
+	{
+		SetupCar();
+		SetupConstructionHandler();
+		SetupEventSystem();
+		SetupGoals();
+		SetupIsometricCamera();
+		SetupMainCamera();
+		SetupUIManager();
+	}
+	
+	void SetupGoals ()
+	{
+		Transform goals = GameObject.Instantiate (goalsPrefab);
+		Transform goalZone = goals.Find("GoalZone");
+		goalZone.position = new Vector3 (goalX, 0);
+		goalZone.GetComponent<BoxCollider2D> ().size = new Vector2 (1, 20);
+	}
+
+	void SetupIsometricCamera ()
+	{
+		GameObject.Instantiate (isometricCameraPrefab);
+	}
+
+	void SetupMainCamera ()
+	{
+
+	}
+
+	void SetupEventSystem()
+	{
+
+	}
+
+	void SetupConstructionHandler()
+	{
+
+	}
+
+	void SetupCar ()
+	{
+
+	}
+
+	void SetupUIManager ()
+	{
+		GameObject.Instantiate (UIManagerPrefab);
 	}
 }
