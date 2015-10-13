@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using Bridger;
 
 public class LevelCreator : ScriptableWizard
 {
@@ -11,7 +12,7 @@ public class LevelCreator : ScriptableWizard
 		gapSize = 5,
 		gapHeight = 5,
 		gapHeightDelta = 2,
-		goalX = 30;
+		goalX = 5;
 	public bool
 		placeJointPoints = true;
 
@@ -116,7 +117,7 @@ public class LevelCreator : ScriptableWizard
 		ImportPrefab(out groundPrefab, "Ground");
 		ImportPrefab(out jointPointPrefab, "JointPoint");
 		ImportPrefab(out carPrefab, "EL CAR");
-		ImportPrefab(out constructionHandlerPrefab, "Construction Handler");
+		ImportPrefab(out constructionHandlerPrefab, "ConstructionHandler");
 		ImportPrefab(out eventSystemPrefab, "EventSystem");
 		ImportPrefab(out goalsPrefab, "Goals");
 		ImportPrefab(out isometricCameraPrefab, "IsoCam Full");
@@ -127,6 +128,10 @@ public class LevelCreator : ScriptableWizard
 	static void ImportPrefab(out Transform prefab, string name)
 	{
 		prefab = AssetDatabase.LoadAssetAtPath<Transform>("Assets/Level Creation/" + name + ".prefab") as Transform;
+		if (prefab == null)
+		{
+			Debug.LogError ("The prefab for " + name + " was not found. It is null");
+		}
 	}
 
 	void SetupLevelNecessities ()
@@ -143,38 +148,46 @@ public class LevelCreator : ScriptableWizard
 	void SetupGoals ()
 	{
 		Transform goals = GameObject.Instantiate (goalsPrefab);
+		goals.name = "Goals";
 		Transform goalZone = goals.Find("GoalZone");
-		goalZone.position = new Vector3 (goalX, 0);
+		goalZone.position = new Vector3 (goalX, gapHeight + gapHeightDelta);
 		goalZone.GetComponent<BoxCollider2D> ().size = new Vector2 (1, 20);
 	}
 
 	void SetupIsometricCamera ()
 	{
-		GameObject.Instantiate (isometricCameraPrefab);
+		Transform isoCam = GameObject.Instantiate (isometricCameraPrefab);
+		isoCam.name = "IsoCam Full";
 	}
 
 	void SetupMainCamera ()
 	{
-
+		Transform mainCam = GameObject.Instantiate (mainCameraPrefab);
+		mainCam.name = "Main Camera";
 	}
 
 	void SetupEventSystem()
 	{
-
+		Transform es = GameObject.Instantiate (eventSystemPrefab);
+		es.name = "EventSystem";
 	}
 
 	void SetupConstructionHandler()
 	{
-
+		Transform ch = GameObject.Instantiate (constructionHandlerPrefab);
+		ch.name = "ConstructionHandler";
 	}
 
 	void SetupCar ()
 	{
-
+		Transform car = GameObject.Instantiate (carPrefab);
+		car.position = new Vector3 (-gapSize / 2 - 1.0f, gapHeight + 1.0f);
+		car.name = "EL CAR";
 	}
 
 	void SetupUIManager ()
 	{
-		GameObject.Instantiate (UIManagerPrefab);
+		Transform uim = GameObject.Instantiate (UIManagerPrefab);
+		uim.name = "UI Manager";
 	}
 }
