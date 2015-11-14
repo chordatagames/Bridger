@@ -4,8 +4,6 @@ using Bridger;
 
 public class LevelUIManager: MonoBehaviour
 {
-	public Transform decorations;
-
 	public void ReloadLevel()
 	{
 		Level.Reload();
@@ -13,20 +11,6 @@ public class LevelUIManager: MonoBehaviour
 	public void StartLevel()
 	{
 		Level.StartPhysics();
-		Renderer r;
-		foreach(Transform t0 in decorations)
-		{
-			foreach(Transform t in t0)
-			{
-				r = t.GetComponent<Renderer>();
-				if(r != null)
-				{
-					r.material.color += new Color(0,0,0,1);
-//					r.material.SetFloat("Z-Depth", -127);
-				}
-//				
-			}
-		}
 	}
 	public void ClearLevel()
 	{

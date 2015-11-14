@@ -2,14 +2,13 @@
 using System.Collections;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
-public abstract class LowPolyMesh : MonoBehaviour
+public abstract class LowPolyMesh : MonoBehaviour //TODO set up pre-runtime generating
 {
 	protected MeshFilter filter;
 	protected MeshRenderer rend;
 	protected MeshCollider col;
-
-	private int _resolution;
-	public int resolution{ get{return _resolution;} protected set{_resolution = value;} }
+	
+	protected int resolution;
 	
 	public float mapScale = 1f;
 	public float sampleScale = 1f;
@@ -19,18 +18,15 @@ public abstract class LowPolyMesh : MonoBehaviour
 	public float colorRandomness;
 	
 	protected float mapRelation;
-
+	
 	protected Mesh mesh;
 	protected Vector3[] verts;
-	protected Vector3[] normals;
 	protected int[] triangles;
 	protected Color[] colors;
 
 	protected int index = 0;
 	protected Vector2 pos = Vector2.zero;
-
-	public bool validMesh{get {return mesh != null;}}
-
+	
 	public virtual void CreateMesh()
 	{	
 		mesh = new Mesh();
@@ -39,26 +35,21 @@ public abstract class LowPolyMesh : MonoBehaviour
 
 		col = GetComponent<MeshCollider>();
 		col.sharedMesh = mesh;
-
-		int arraySize = Mathf.RoundToInt(_resolution * _resolution*6); //two triangles per sample
-
-		triangles = new int[arraySize]; 
-		verts = new Vector3[arraySize];
-		normals = new Vector3[arraySize];
-		colors = new Color[arraySize];
-
+		
+		triangles = new int[Mathf.RoundToInt(resolution * resolution*6)]; //two triangles per sample
+		verts = new Vector3[Mathf.RoundToInt(resolution * resolution*6)];
+		colors = new Color[Mathf.RoundToInt(resolution * resolution*6)];
 
 		Generate();
-		mesh.Optimize();
-		mesh.RecalculateNormals();
-		normals = mesh.normals;
+		index = 0;
+		pos = Vector2.zero;
 	}
 
-	protected void Generate()
+	void Generate()
 	{
-		while(pos.x != _resolution)
+		while(pos.x != resolution)
 		{
-			while (pos.y != _resolution)
+			while (pos.y != resolution)
 			{
 				AssignSample(); //[0,0] 0
 				
@@ -81,14 +72,10 @@ public abstract class LowPolyMesh : MonoBehaviour
 				//NEW TRIANGLE
 				IteratorMove(-1, 0);
 			}
-			pos += -Vector2.up*_resolution + Vector2.right;
+			pos += -Vector2.up*resolution + Vector2.right;
 		}
 		mesh.vertices = verts;
 		mesh.triangles = triangles;
-
-		index = 0;
-		pos = Vector2.zero;
-
 		CompleteMesh();
 	}
 
@@ -123,7 +110,7 @@ public abstract class LowPolyMesh : MonoBehaviour
 
 	void AssignSample()
 	{
-		verts[index] = new Vector3(pos.x, GetHeight((int)pos.x, (int)pos.y), pos.y)*sampleScale*mapScale;
+		verts[index] = new Vector3(pos.x - resolution*0.5f, GetHeight((int)pos.x, (int)pos.y), pos.y - resolution*0.5f)*sampleScale*mapScale;
 		triangles[index] = index;
 	}
 

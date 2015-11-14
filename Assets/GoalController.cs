@@ -17,6 +17,7 @@ namespace Bridger
 			if(Level.mode == Level.LevelMode.PLAY)
 			{
 				_completed = !Level.completed; //this is to only make the level complete once, if not complete, temporarely set to true
+				Debug.Log(_completed);
 				foreach(GoalZone goal in goals)
 				{
 					_completed &= goal.completed;
