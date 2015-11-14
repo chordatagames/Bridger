@@ -13,11 +13,14 @@ public abstract class LowPolyMesh : MonoBehaviour //TODO set up pre-runtime gene
 	public float mapScale = 1f;
 	public float sampleScale = 1f;
 	public float height = 60f;
+
+	public int samplesPerFrame = 100;
 	
 	public Gradient colorPallet; //normalized by height
 	public float colorRandomness;
 	
 	protected float mapRelation;
+	protected float heightScale;
 	
 	protected Mesh mesh;
 	protected Vector3[] verts;
@@ -26,8 +29,8 @@ public abstract class LowPolyMesh : MonoBehaviour //TODO set up pre-runtime gene
 
 	protected int index = 0;
 	protected Vector2 pos = Vector2.zero;
-	
-	public virtual void CreateMesh()
+
+	protected virtual void Start ()
 	{	
 		mesh = new Mesh();
 		filter = GetComponent<MeshFilter>();
@@ -35,14 +38,15 @@ public abstract class LowPolyMesh : MonoBehaviour //TODO set up pre-runtime gene
 
 		col = GetComponent<MeshCollider>();
 		col.sharedMesh = mesh;
+
+		heightScale = height/sampleScale;
 		
 		triangles = new int[Mathf.RoundToInt(resolution * resolution*6)]; //two triangles per sample
 		verts = new Vector3[Mathf.RoundToInt(resolution * resolution*6)];
 		colors = new Color[Mathf.RoundToInt(resolution * resolution*6)];
 
 		Generate();
-		index = 0;
-		pos = Vector2.zero;
+//		StartCoroutine("Generate",samplesPerFrame);
 	}
 
 	void Generate()
@@ -79,29 +83,53 @@ public abstract class LowPolyMesh : MonoBehaviour //TODO set up pre-runtime gene
 		CompleteMesh();
 	}
 
-	public virtual void ReloadColor()
+	IEnumerator Generate(int timeStep)
 	{
-		Vector3 trianglePos = Vector3.zero;
-		float highest=0, lowest=float.MaxValue;
-
-		for (int vert = 2; vert < verts.Length; vert+=3)
+		while(pos.x != resolution)
 		{
-			trianglePos = (verts[vert-2] + verts[vert-1] + verts[vert])/3;
-			
-			for(int i=0; i < 3; i++)
+			while (pos.y != resolution)
 			{
-				lowest = (verts[vert-i].y < lowest) ? verts[vert-i].y : lowest;
-				highest = (verts[vert-i].y > highest) ? verts[vert-i].y : highest;
+				AssignSample();
+
+				IteratorMove(0, 1);
+				AssignSample();
+
+				IteratorMove(1, -1);
+				AssignSample();
+
+				//NEW TRIANGLE
+				IteratorMove(0, 0);
+				AssignSample();
+
+				IteratorMove(-1, 1);
+				AssignSample();
+
+				IteratorMove(1, 0);
+				AssignSample();
+
+				//NEW TRIANGLE
+				IteratorMove(-1, 0);
+
+				if(index%timeStep == 0)
+				{
+					mesh.vertices = verts;
+					mesh.triangles = triangles;
+					yield return null;
+				}
 			}
-			colors[vert] = colorPallet.Evaluate((trianglePos.y+Random.value*colorRandomness)/height);
-			colors[vert-1] = colors[vert];
-			colors[vert-2] = colors[vert];
-			
+			pos += -Vector2.up*resolution + Vector2.right;
 		}
-		mesh.colors = colors;
+		mesh.vertices = verts;
+		mesh.triangles = triangles;
+
+		StopCoroutine("Generate");
+		CompleteMesh();
 	}
 
-	protected abstract void CompleteMesh();
+	protected virtual void CompleteMesh()
+	{
+		return;
+	}
 
 	protected virtual float GetHeight(int x, int y)
 	{
