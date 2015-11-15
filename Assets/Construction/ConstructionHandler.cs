@@ -6,8 +6,8 @@ using System.Collections.Generic;
 namespace Bridger
 {
 //TODO add object pooling from a "Level"-class
-	[RequireComponent(typeof(DontLoadDestroy))]
-	public class ConstructionHandler : MonoBehaviour
+	[RequireComponent(typeof(DontLoadDestroy), typeof(ConstructionControl))]
+    public class ConstructionHandler : MonoBehaviour
 	{
 		public static ConstructionHandler instance;
 		public GameObject jointBase;
@@ -16,9 +16,14 @@ namespace Bridger
 		public Rect constructionBorder;
 		public AudioSource audioSource;
 
-		Vector2 mousePosition{ get{return (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);} }
+        private static ConstructionControl _materialControl;
+        public static ConstructionControl materialControl { get { return _materialControl; } }
+
+        Vector2 mousePosition{ get{return (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);} }
 		BridgePart buildingPart;
 		BridgePart lastPart;
+
+
 
 		void Awake()
 		{
@@ -29,6 +34,7 @@ namespace Bridger
 			else
 			{
 				instance = this;
+                _materialControl = GetComponent<ConstructionControl>();
 			}
 		}
 
