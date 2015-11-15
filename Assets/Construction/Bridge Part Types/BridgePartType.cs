@@ -14,6 +14,7 @@ namespace Bridger
 		public Material material;
 		public Texture2D partPreviewTexture;
 		public PhysicsMaterial2D physMaterial;
+		public AudioClip placementSound;
 
 		public void LoadType(GameObject go)
 		{

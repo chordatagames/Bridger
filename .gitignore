@@ -1,4 +1,5 @@
 *_[Dd]ata/
+[Bb]uild_*/
 
 [Ll]ibrary/
 [Tt]emp/
@@ -74,8 +75,10 @@ $RECYCLE.BIN/
 # Windows program debugging database
 *.pdb
 
-#Visual Studio weird thingy
-.vs/
+#Visual Studio weird thingy solution I guess
+bin/
+obj/
+.vs/Bridger/v14/.suo
 
 #Testing Level
 Assets/Scenes/Testing Level.unity

@@ -95,16 +95,16 @@ namespace Bridger
 		{
 			ConstructionHandler.instance.UnSlowMo();
 		}
-		public static void CloseLevel()
-		{
-			mode = LevelMode.BUILD;
-			completed = false;
-			levelObjects.Clear();
-			undoStack.Clear();
-			redoStack.Clear();
-		}
+        public static void ResetLevel()
+        {
+            mode = LevelMode.BUILD;
+            completed = false;
+            levelObjects.Clear();
+            undoStack.Clear();
+            redoStack.Clear();
+        }
 
-	}
+    }
 
 	[System.Serializable]
 	public struct TransformData
