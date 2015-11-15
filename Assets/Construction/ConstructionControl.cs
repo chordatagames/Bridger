@@ -27,7 +27,6 @@ namespace Bridger
 
 		void Update()
 		{
-
 			if(Input.GetMouseButtonDown(1))//RightClick
 			{
 				ResetMaterialSelection();
