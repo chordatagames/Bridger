@@ -15,13 +15,20 @@ public class GridGUI : MonoBehaviour
 	private Vector2 origin;
 	private Vector2 gridSize;
 
-	void Start() {
+	void Start()
+	{
+		LoadGridInfo();
+	}
+
+	void LoadGridInfo()
+	{
 		cam = GetComponent<Camera>();
 		origin = Vector2.one*Grid.gridSize;
 		gridSize = new Vector2(4.0f,2.0f) * cam.orthographicSize;
 	}
 
-	void OnPostRender() {
+	void OnPostRender()
+	{
 		GL.PushMatrix();
 		lineMaterial.SetPass(0);
 		GL.LoadOrtho();
@@ -32,23 +39,23 @@ public class GridGUI : MonoBehaviour
 		// begin grid
 		if (grid)
 		{
-			// X axis lines
+			// Vertical Lines
 			int lineCountX = 0;
 			for (float i = origin.x - (gridSize.x / 2 + pass); i <= origin.x + (gridSize.x / 2 - pass); i += pass)
 			{
 				GL.Color( ((lineCountX % strongLineSpace == 0) ? secondaryColor : gridColor) );
-				GL.Vertex(new Vector3(i, cam.transform.position.y - gridSize.y / 2, 0));
-				GL.Vertex(new Vector3(i, cam.transform.position.y + gridSize.y / 2, 0));
+				GL.Vertex(new Vector3(i,-gridSize.y / 2, -cam.transform.position.z) + cam.transform.position);
+				GL.Vertex(new Vector3(i, gridSize.y / 2, -cam.transform.position.z) + cam.transform.position);
 				lineCountX++;
 			}
 
-			// Y axis lines
+			// Horizontal Lines
 			int lineCountY = 0;
 			for (float i = origin.y - (gridSize.y / 2 + pass); i <= origin.y + (gridSize.y / 2 - pass); i += pass)
 			{
 				GL.Color( ((lineCountY % strongLineSpace == 0) ? secondaryColor : gridColor) );
-				GL.Vertex(new Vector3(cam.transform.position.x - gridSize.x / 2, i, 0));
-				GL.Vertex(new Vector3(cam.transform.position.x + gridSize.x / 2, i, 0));
+				GL.Vertex(new Vector3(-gridSize.x / 2, i, -cam.transform.position.z) + cam.transform.position);
+				GL.Vertex(new Vector3( gridSize.x / 2, i, -cam.transform.position.z) + cam.transform.position);
 				lineCountY++;
 			}
 			
@@ -75,5 +82,11 @@ public class GridGUI : MonoBehaviour
 
 		GL.End();
 		GL.PopMatrix();
+	}
+
+	//Call this whenever you change the camera after initiating this script
+	public void UpdateGrid()
+	{
+		LoadGridInfo ();
 	}
 }

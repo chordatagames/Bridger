@@ -3,6 +3,7 @@ using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
 using Bridger;
+using UnityEngine.UI;
 
 public class LevelCreator : ScriptableWizard
 {
@@ -12,7 +13,11 @@ public class LevelCreator : ScriptableWizard
 		gapSize = 5,
 		gapHeight = 5,
 		gapHeightDelta = 2,
-		goalX = 5;
+		buildZoneLeft = 2,
+		buildZoneRight = 2,
+		buildZoneDown = 2,
+		buildZoneUp = 2,
+		goalLineX = 5;
 	public bool
 		placeJointPoints = true;
 
@@ -20,17 +25,12 @@ public class LevelCreator : ScriptableWizard
 		level,
 		floor,
 		wall_L,
-		wall_R;
+		wall_R,
+		parentOfNecessities;
 	static private Transform
 		groundPrefab,
 		jointPointPrefab,
-		carPrefab,
-		constructionHandlerPrefab,
-		eventSystemPrefab,
-		goalsPrefab,
-		isometricCameraPrefab,
-		mainCameraPrefab,
-		UIManagerPrefab;
+		parentOfNecessitiesPrefab;
 
 	[MenuItem ("Bridger/Create Level")]
 	static void CreateWizard ()
@@ -116,13 +116,7 @@ public class LevelCreator : ScriptableWizard
 	{
 		ImportPrefab(out groundPrefab, "Ground");
 		ImportPrefab(out jointPointPrefab, "JointPoint");
-		ImportPrefab(out carPrefab, "EL CAR");
-		ImportPrefab(out constructionHandlerPrefab, "ConstructionHandler");
-		ImportPrefab(out eventSystemPrefab, "EventSystem");
-		ImportPrefab(out goalsPrefab, "Goals");
-		ImportPrefab(out isometricCameraPrefab, "IsoCam Full");
-		ImportPrefab(out mainCameraPrefab, "Main Camera");
-		ImportPrefab(out UIManagerPrefab, "UI Manager");
+		ImportPrefab (out parentOfNecessitiesPrefab, "ParentOfNecessities");
 	}
 
 	static void ImportPrefab(out Transform prefab, string name)
@@ -136,6 +130,7 @@ public class LevelCreator : ScriptableWizard
 
 	void SetupLevelNecessities ()
 	{
+		InstantiateNecessities();
 		SetupCar();
 		SetupConstructionHandler();
 		SetupEventSystem();
@@ -143,51 +138,61 @@ public class LevelCreator : ScriptableWizard
 		SetupIsometricCamera();
 		SetupMainCamera();
 		SetupUIManager();
+		RemoveParentOfNecessities();
 	}
-	
+
+	void InstantiateNecessities ()
+	{
+		parentOfNecessities = GameObject.Instantiate (parentOfNecessitiesPrefab);
+	}
+
 	void SetupGoals ()
 	{
-		Transform goals = GameObject.Instantiate (goalsPrefab);
-		goals.name = "Goals";
+		Transform goals = parentOfNecessities.Find("Goals");
 		Transform goalZone = goals.Find("GoalZone");
-		goalZone.position = new Vector3 (goalX, gapHeight + gapHeightDelta);
+		goalZone.position = new Vector3 (goalLineX, gapHeight + gapHeightDelta);
 		goalZone.GetComponent<BoxCollider2D> ().size = new Vector2 (1, 20);
 	}
 
 	void SetupIsometricCamera ()
 	{
-		Transform isoCam = GameObject.Instantiate (isometricCameraPrefab);
-		isoCam.name = "IsoCam Full";
 	}
 
 	void SetupMainCamera ()
 	{
-		Transform mainCam = GameObject.Instantiate (mainCameraPrefab);
-		mainCam.name = "Main Camera";
+		Transform mainCam = parentOfNecessities.Find ("Main Camera");
+		mainCam.position = new Vector3 (0, gapHeight, -10);
+		mainCam.GetComponent<Camera> ().orthographicSize = gapHeight + 1;
+		mainCam.GetComponent<GridGUI> ().UpdateGrid ();
 	}
 
 	void SetupEventSystem()
 	{
-		Transform es = GameObject.Instantiate (eventSystemPrefab);
-		es.name = "EventSystem";
 	}
 
 	void SetupConstructionHandler()
 	{
-		Transform ch = GameObject.Instantiate (constructionHandlerPrefab);
-		ch.name = "ConstructionHandler";
+		Transform ch = parentOfNecessities.Find("ConstructionHandler");
+		ConstructionHandler chScript = ch.GetComponent<ConstructionHandler> ();
+		chScript.constructionBorder.x = -gapSize/2 - buildZoneLeft;
+		chScript.constructionBorder.y = gapHeight - buildZoneDown;
+		chScript.constructionBorder.width = buildZoneLeft + gapSize + buildZoneRight;
+		chScript.constructionBorder.height = buildZoneUp + buildZoneUp;
 	}
 
 	void SetupCar ()
 	{
-		Transform car = GameObject.Instantiate (carPrefab);
+		Transform car = parentOfNecessities.Find("EL CAR");
 		car.position = new Vector3 (-gapSize / 2 - 1.0f, gapHeight + 1.0f);
-		car.name = "EL CAR";
 	}
 
 	void SetupUIManager ()
 	{
-		Transform uim = GameObject.Instantiate (UIManagerPrefab);
-		uim.name = "UI Manager";
+	}
+
+	void RemoveParentOfNecessities()
+	{
+		parentOfNecessities.DetachChildren ();
+		GameObject.DestroyImmediate ((Object)parentOfNecessities.gameObject);
 	}
 }
