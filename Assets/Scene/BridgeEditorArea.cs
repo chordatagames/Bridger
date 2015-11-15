@@ -8,25 +8,35 @@ namespace Bridger
 	public class BridgeEditorArea : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 	{
 		static BridgePart currentPart;
-		Rect editorArea{get{return (transform as RectTransform).rect;}}
+		Rect editorArea{ get { return( transform as RectTransform ).rect; } }
 		Vector2 pivot = Vector2.one*0.5f;
 
 		Vector2 mousePosition(PointerEventData eventData)
 		{
 			Vector2 position = (Vector2)eventData.pressEventCamera.ScreenToWorldPoint(eventData.position);
-			if(!editorArea.Contains(position))
+            Vector2 relativePos = ( ( position - (Vector2)transform.position ) - editorArea.center );
+            if(!editorArea.Contains(position))
 			{
-				float aspect = editorArea.height/editorArea.width;
 
-				float tan = Mathf.Abs(position.y/position.x);
-				float cot = Mathf.Abs(position.x/position.y);
-				position = new Vector2(
-					((tan <= aspect) ? editorArea.width * pivot.x : cot * editorArea.height * pivot.y) * Mathf.Sign(position.x),
-					((tan > aspect) ? editorArea.height * pivot.y : tan * editorArea.width * pivot.x)) * Mathf.Sign(position.y);
-			}
-			//Vektor[( ((tangens <= f) ? a / 2 : cotangens b / 2) Methf.sign(position.x), (tangens <= f), tangens a / 2, b / 2] sgn(y(F)))]
+				float tanAspect = editorArea.width/editorArea.height;
+                float cotAspect = 1 / tanAspect;
 
-//			position = new Vector2( Mathf.Clamp(position.x,(position-editorArea.min).x,(position-editorArea.max).x),  Mathf.Clamp(position.y,(position-editorArea.min).y,(position-editorArea.max).y));//TODO normalize to rect
+                float relativeTanAspect = relativePos.x / relativePos.y;
+
+                float tan = Mathf.Abs(cotAspect*(relativeTanAspect));
+                float cot = tanAspect*(1/tan); //no need for abs as we're already operating with only positives
+
+                Vector2 sign = new Vector2(Mathf.Sign(relativePos.x), Mathf.Sign(relativePos.y));
+
+                if( relativeTanAspect < tanAspect )
+                {
+                    position = new Vector2(tan * sign.x, editorArea.height * 0.5f * sign.y);
+                }
+                else
+                {
+                    position = new Vector2(editorArea.width * 0.5f * sign.x, cot * sign.y);
+                }
+            }
 			return position;
 		}
 
