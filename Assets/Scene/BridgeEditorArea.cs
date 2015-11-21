@@ -14,30 +14,42 @@ namespace Bridger
 		Vector2 mousePosition(PointerEventData eventData)
 		{
 			Vector2 position = (Vector2)eventData.pressEventCamera.ScreenToWorldPoint(eventData.position);
-            Vector2 relativePos = ( ( position - (Vector2)transform.position ) - editorArea.center );
+            Vector2 newPosition = position;
             if(!editorArea.Contains(position))
 			{
+                if(currentPart != null)
+                {
+                    //position -= currentPart.partOrigin;
+                }
+				float tanAspect = editorArea.width/editorArea.height; //positive
+                float cotAspect = 1 / tanAspect; //positive
 
-				float tanAspect = editorArea.width/editorArea.height;
-                float cotAspect = 1 / tanAspect;
+                float relativeTanAspect = Mathf.Abs(position.x / position.y);
 
-                float relativeTanAspect = relativePos.x / relativePos.y;
-
-                float tan = Mathf.Abs(cotAspect*(relativeTanAspect));
+                float tan = cotAspect*(relativeTanAspect);
                 float cot = tanAspect*(1/tan); //no need for abs as we're already operating with only positives
 
-                Vector2 sign = new Vector2(Mathf.Sign(relativePos.x), Mathf.Sign(relativePos.y));
+                Vector2 sign = new Vector2(Mathf.Sign(position.x), Mathf.Sign(position.y));
 
                 if( relativeTanAspect < tanAspect )
                 {
-                    position = new Vector2(tan * sign.x, editorArea.height * 0.5f * sign.y);
+                    
+                    newPosition = new Vector2(tan * sign.x * editorArea.width, sign.y * editorArea.height) * Grid.gridSize;//RED
                 }
                 else
                 {
-                    position = new Vector2(editorArea.width * 0.5f * sign.x, cot * sign.y);
+                    newPosition = new Vector2(sign.x * editorArea.width, cot * cotAspect * sign.y * editorArea.height) * Grid.gridSize;//BLUE
                 }
+                if(currentPart != null)
+                {
+                    Debug.DrawLine(Vector3.zero, (Vector3)position, Color.yellow);
+                    Debug.DrawLine((Vector3)currentPart.partOrigin, new Vector3(tan * sign.x * editorArea.width, sign.y * editorArea.height) * Grid.gridSize, Color.red);
+                    Debug.DrawLine((Vector3)currentPart.partOrigin, new Vector3(sign.x * editorArea.width, cot*cotAspect * sign.y * editorArea.height) * Grid.gridSize, Color.blue);
+                }
+
             }
-			return position;
+            
+			return newPosition;
 		}
 
 		public void OnPointerDown(PointerEventData eventData)
@@ -58,4 +70,5 @@ namespace Bridger
 			currentPart.EndStretch();
 		}
 	}
+    
 }
