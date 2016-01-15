@@ -3,7 +3,6 @@ using System.Collections;
 
 public class AlphaZControl : MonoBehaviour //All objects that could obstruct the view while building would be a child of this
 {
-	//TODO make this the control for alpha between modes
 	public float zLimit, alphaValue;
 
 	void Start()
