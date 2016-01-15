@@ -57,7 +57,7 @@ namespace Bridger
 			return instance;
 		}
 
-		public void Strech(Vector2 strech)
+		public void Stretch(Vector2 strech)
 		{
 			editing = true;
 			Vector2 relation = Grid.ToGrid (Vector2.ClampMagnitude (strech - partOrigin, materialType.maxLength));
@@ -65,7 +65,7 @@ namespace Bridger
 			transform.rotation = Quaternion.AngleAxis (Angles.Angle (Vector2.right, relation, false), Vector3.forward);
 			transform.localScale = new Vector3 (relation.magnitude, 0.25f, 2);
 		}
-		public void EndStrech()
+		public void EndStretch()
 		{
 			editing = false;
 			if(partLength < Grid.gridSize)
@@ -87,14 +87,6 @@ namespace Bridger
 			joint.transform.SetParent(transform, true);
 			joint.transform.localScale = Vector3.one*(Grid.gridSize*4.0f/partLength) + Vector3.up*8;
 			joint.transform.localRotation = Quaternion.identity;
-
-
-//			GameObject go = new GameObject("joint");//TODO set UI sprite as well
-//			go.AddComponent<CircleCollider2D>().radius = Grid.gridSize/4;
-//			go.layer = 9; //JOINT
-//			go.transform.position = (Vector3)position;
-//			go.transform.SetParent(transform, true);
-//			go.transform.localScale = Vector3.one*(Grid.gridSize*2.0f/partLength);
 			return joint;
 		}
 

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
@@ -83,7 +83,7 @@ namespace Bridger
 					{
 						if(buildingPart.editing)
 						{
-							buildingPart.EndStrech();
+							buildingPart.EndStretch();
 						}
 						buildingPart = BridgePart.Create(partType, (Input.GetKey(KeyCode.LeftShift) ? buildingPart.partEnd : mousePosition));
 					}
@@ -101,13 +101,13 @@ namespace Bridger
 			{
 				if(buildingPart.editing)
 				{
-					buildingPart.Strech(mousePosition);
+					buildingPart.Stretch(mousePosition);
 				}
 				if(Input.GetMouseButtonUp(0))
 				{
 					if(!obstructed && constructionBorder.Contains(mousePosition))
 					{
-						buildingPart.EndStrech();
+						buildingPart.EndStretch();
 					}
 				}
 			}

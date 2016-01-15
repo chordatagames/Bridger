@@ -54,10 +54,13 @@ namespace Bridger
 
 		public void OnPointerDown(PointerEventData eventData)
 		{
-			currentPart = BridgePart.Create(
+			if (eventData.button == PointerEventData.InputButton.Left)
+			{
+				currentPart = BridgePart.Create(
 				ConstructionControl.materialControl.currentMaterial, 
 				Input.GetKey(KeyCode.LeftShift) ? currentPart.partEnd : mousePosition(eventData));
-			currentPart.StartStretch();
+				currentPart.Stretch(mousePosition(eventData));
+			}
 		}
 
 		public void OnDrag(PointerEventData eventData)
