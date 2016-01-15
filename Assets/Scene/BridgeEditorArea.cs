@@ -11,7 +11,17 @@ namespace Bridger
 		Rect editorArea{ get { return( transform as RectTransform ).rect; } }
 		Vector2 pivot = Vector2.one*0.5f;
 
-		Vector2 mousePosition(PointerEventData eventData)
+        private bool leftMouseDown(PointerEventData eventData)
+        {
+            return eventData.button == PointerEventData.InputButton.Left;
+        }
+        private bool rightMouseDown(PointerEventData eventData)
+        {
+            return eventData.button == PointerEventData.InputButton.Right;
+        }
+
+
+        Vector2 mousePosition(PointerEventData eventData)
 		{
 			Vector2 position = (Vector2)eventData.pressEventCamera.ScreenToWorldPoint(eventData.position);
             Vector2 newPosition = position;
@@ -54,11 +64,14 @@ namespace Bridger
 
 		public void OnPointerDown(PointerEventData eventData)
 		{
-			currentPart = BridgePart.Create(
-				ConstructionControl.materialControl.currentMaterial, 
-				Input.GetKey(KeyCode.LeftShift) ? currentPart.partEnd : mousePosition(eventData));
-			currentPart.StartStretch();
-		}
+            if(leftMouseDown(eventData))
+            {
+			    currentPart = BridgePart.Create(
+				    ConstructionControl.materialControl.currentMaterial, 
+				    Input.GetKey(KeyCode.LeftShift) ? currentPart.partEnd : mousePosition(eventData));
+			        currentPart.StartStretch();
+            }
+        }
 
 		public void OnDrag(PointerEventData eventData)
 		{
