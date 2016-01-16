@@ -77,12 +77,13 @@ namespace Bridger
 			resetTransform = new TransformData(transform);
 			Level.AddToLevel(this);
 		}
-
+        
 		GameObject CreateJointCollider(Vector2 position)
 		{
 			GameObject joint = Instantiate<GameObject>(ConstructionHandler.instance.jointBase); //TODO remove the connection though ConstructionHandler
 			joint.transform.position = (Vector3)position + Vector3.back*9;
-			joint.transform.SetParent(transform, true);
+            joint.transform.parent = transform;
+            joint.transform.localScale = new Vector3(1 / partLength, 1, 1);
 			joint.transform.localRotation = Quaternion.identity;
 			return joint;
 		}
