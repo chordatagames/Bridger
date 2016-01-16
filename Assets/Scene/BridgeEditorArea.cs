@@ -10,8 +10,17 @@ namespace Bridger
         public BridgePart[] partPrefabs;
 
         static BridgePart currentPart;
-		Rect editorArea{ get { return( transform as RectTransform ).rect; } }
-		Vector2 pivot = Vector2.one*0.5f;
+        Vector2 pivot = Vector2.one * 0.5f;
+        Rect _editorArea = new Rect();
+        Rect editorArea
+        {
+            get
+            {
+                _editorArea = GetComponent<RectTransform>().rect;
+                return _editorArea;
+            }
+        }
+		
 
         private bool leftMouseDown(PointerEventData eventData)
         {
@@ -24,8 +33,8 @@ namespace Bridger
 
         Vector2 mousePosition(PointerEventData eventData)
 		{
+
 			Vector2 position = (Vector2)eventData.pressEventCamera.ScreenToWorldPoint(eventData.position);
-            
             Vector2 newPosition = position;
             if(!editorArea.Contains(position))
 			{
@@ -45,7 +54,6 @@ namespace Bridger
 
                 if( relativeTanAspect < tanAspect )
                 {
-                    
                     newPosition = new Vector2(tan * sign.x * editorArea.width , sign.y * editorArea.height) * Grid.gridSize;//RED
                 }
                 else
@@ -93,7 +101,10 @@ namespace Bridger
 		
 		public void OnPointerUp(PointerEventData eventData)
 		{
-			currentPart.EndStretch();
+            if (leftMouseDown(eventData))
+            {
+                currentPart.EndStretch();
+            }
 		}
 	}
     

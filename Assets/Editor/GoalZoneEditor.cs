@@ -9,7 +9,7 @@ namespace BridgerEditor
 	public class GoalZoneEditor : Editor
 	{
 		GoalZone zone;
-
+        
 		void OnSceneGUI()
 		{
 			zone = target as GoalZone;

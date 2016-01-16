@@ -52,11 +52,13 @@ namespace Bridger
 		{
 			if(anchorPart.partType.strength > 0)
 			{
-				if(joint.GetReactionForce(Time.deltaTime).magnitude > jointStrength)
+                Vector3 force = joint.GetReactionForce(Time.deltaTime);
+                if (force.magnitude > jointStrength)
 				{
 					Break();
 					Level.Slowmo();
 				}
+                Debug.DrawLine(joint.anchor, force, Color.red,5f);
 			}
 		}
 		

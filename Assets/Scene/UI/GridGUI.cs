@@ -70,7 +70,7 @@ public class GridGUI : MonoBehaviour
 		GL.Color(Color.red);
 		
 		// they have to be done like this because they need to be above the grid. bleh
-		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y, -1));
+		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y, -1 ));
 		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y + bounds.size.y, -1));
 
 		GL.Vertex(new Vector3(bounds.position.x, bounds.position.y + bounds.size.y, -1));
