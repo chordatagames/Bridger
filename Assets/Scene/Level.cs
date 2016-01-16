@@ -88,13 +88,15 @@ namespace Bridger
 		}
 		public static void Slowmo()
 		{
-			ConstructionHandler.instance.SlowMo(slowTimeSpeed);
-		}
+            Time.timeScale = slowMotionTimeScale;
+            Time.fixedDeltaTime = 0.02F * Time.timeScale; //by default 30 times pr sec 0.02*1
+        }
 
-		public static void UnSlowmo()
+		public static void UnSlowmo() //TODO put the timecontrol stuff into a lerp thingy.
 		{
-			ConstructionHandler.instance.UnSlowMo();
-		}
+            Time.timeScale = 1f;
+            Time.fixedDeltaTime = 0.02F * Time.timeScale;
+        }
         public static void ResetLevel()
         {
             mode = LevelMode.BUILD;

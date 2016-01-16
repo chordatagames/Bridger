@@ -7,10 +7,11 @@ namespace Bridger
 	[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 	public class BridgePart : MonoBehaviour, IReloadable, IRevertable
 	{
-		public static bool showStress = false;
+		public static bool showStress = true;
 
 		public bool editing = true;
-		public BridgePartType partType;
+        public GameObject jointPrefab;
+        public BridgePartType partType;
 
 		private Rigidbody2D rigid;
 
@@ -35,13 +36,16 @@ namespace Bridger
 			if (showStress)
 			{
 				// get average stress
-				float sum = 0;
+				float forceSum = 0.0f;
 				foreach (BridgeJoint bridgeJoint in connectedTo)
 				{
-					sum += bridgeJoint.joint.GetReactionForce(Time.deltaTime).magnitude;
+					forceSum += bridgeJoint.joint.GetReactionForce(Time.deltaTime).magnitude;
 				}
-				float average = sum / connectedTo.Length;
-				gameObject.GetComponent<Renderer>().material.color = new Color((1f/5f)*average,1-(1f/5f)*average,0);
+				float fraction = (forceSum / connectedTo.Length) / partType.strength;
+                foreach (MeshRenderer r in gameObject.GetComponentsInChildren<MeshRenderer>())
+                {
+                    r.material.color = new Color(fraction, 1 - fraction, 0);
+                }
 			}
 		}
 
@@ -80,7 +84,7 @@ namespace Bridger
         
 		GameObject CreateJointCollider(Vector2 position)
 		{
-			GameObject joint = Instantiate<GameObject>(ConstructionHandler.instance.jointBase); //TODO remove the connection though ConstructionHandler
+			GameObject joint = Instantiate<GameObject>(jointPrefab); //TODO remove the connection though ConstructionHandler
 			joint.transform.position = (Vector3)position + Vector3.back*9;
             joint.transform.parent = transform;
             joint.transform.localScale = new Vector3(1 / partLength, 1, 1);

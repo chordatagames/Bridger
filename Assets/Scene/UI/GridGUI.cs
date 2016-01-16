@@ -4,7 +4,8 @@ using System;
 
 public class GridGUI : MonoBehaviour
 {
-	public float pass { get { return Grid.gridSize; } set { pass = value; } }
+    public RectTransform gridObject;
+    public float pass { get { return Grid.gridSize; } set { pass = value; } }
 	public bool grid;
 	public Color gridColor, secondaryColor;
 	public int strongLineSpace = 5;
@@ -14,6 +15,7 @@ public class GridGUI : MonoBehaviour
 
 	private Vector2 origin;
 	private Vector2 gridSize;
+
 
 	void Start()
 	{
@@ -60,10 +62,11 @@ public class GridGUI : MonoBehaviour
 			}
 			
 		}
-		// end grid
+        // end grid
 
-		// begin border - i wish there was a better way to do this.
-		Rect bounds = Bridger.ConstructionHandler.instance.constructionBorder;
+        // begin border - i wish there was a better way to do this.
+        Rect bounds = gridObject.rect;
+        bounds.position += (Vector2)gridObject.position;
 		GL.Color(Color.red);
 		
 		// they have to be done like this because they need to be above the grid. bleh
