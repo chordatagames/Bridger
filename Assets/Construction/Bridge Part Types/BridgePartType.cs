@@ -5,7 +5,6 @@ namespace Bridger
 	[CreateAssetMenu()]
 	public class BridgePartType : ScriptableObject
 	{
-		public GameObject model;
 		public float 
 			strength,
 			maxLength,

@@ -7,6 +7,8 @@ namespace Bridger
 	[RequireComponent(typeof(UnityEngine.UI.Image))]
 	public class BridgeEditorArea : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 	{
+        public BridgePart[] partPrefabs;
+
 		static BridgePart currentPart;
 		Rect editorArea{ get { return( transform as RectTransform ).rect; } }
 		Vector2 pivot = Vector2.one*0.5f;
@@ -19,7 +21,6 @@ namespace Bridger
         {
             return eventData.button == PointerEventData.InputButton.Right;
         }
-
 
         Vector2 mousePosition(PointerEventData eventData)
 		{
@@ -67,10 +68,22 @@ namespace Bridger
 	        if(leftMouseDown(eventData))
 	        {
 			    currentPart = BridgePart.Create(
-			    	ConstructionControl.materialControl.currentMaterial, 
+			        partPrefabs[ConstructionControl.partType], 
 			    	Input.GetKey(KeyCode.LeftShift) ? currentPart.partEnd : mousePosition(eventData));
 				currentPart.Stretch(mousePosition(eventData));
 			}
+            if(rightMouseDown(eventData))
+            {
+                if(ConstructionControl.partType < partPrefabs.Length-1)
+                {
+                    ConstructionControl.partType++;
+                }
+                else
+                {
+                    ConstructionControl.partType = 0;
+                }
+            }
+
         }
 
 		public void OnDrag(PointerEventData eventData)

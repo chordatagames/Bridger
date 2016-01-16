@@ -10,7 +10,7 @@ namespace Bridger
 		public static bool showStress = false;
 
 		public bool editing = true;
-		public BridgePartType materialType;
+		public BridgePartType partType;
 
 		private Rigidbody2D rigid;
 
@@ -19,7 +19,7 @@ namespace Bridger
 		public Vector2 partEnd 		{ get{return Grid.ToGrid(transform.position + transform.right * partLength/2);} }
 
 		public float partLength	{ get{return transform.localScale.x;} }
-		public float partMass	{ get{return partLength * materialType.massPerLength;} }
+		public float partMass	{ get{return partLength * partType.massPerLength;} }
 
 		public BridgeJoint[] connectedTo { get {return _connectedTo.ToArray();} }
 		List<BridgeJoint> _connectedTo = new List<BridgeJoint>();
@@ -28,7 +28,6 @@ namespace Bridger
 
 		void Start()
 		{
-			materialType.LoadType(gameObject);
 		}
 
 		void Update()
@@ -46,11 +45,10 @@ namespace Bridger
 			}
 		}
 
-		public static BridgePart Create(BridgePartType type, Vector2 position)
+		public static BridgePart Create(BridgePart part, Vector2 position)
 		{
-			BridgePart instance = Instantiate<GameObject>(type.model).AddComponent<BridgePart>();
+			BridgePart instance = Instantiate<BridgePart>(part);
 			instance.partOrigin = Grid.ToGrid(position);
-			instance.materialType = type;
 			instance.rigid = instance.GetComponent<Rigidbody2D>();
 			instance.rigid.isKinematic = true;
 			instance.transform.position = (Vector3)instance.partOrigin;
@@ -60,10 +58,10 @@ namespace Bridger
 		public void Stretch(Vector2 strech)
 		{
 			editing = true;
-			Vector2 relation = Grid.ToGrid (Vector2.ClampMagnitude (strech - partOrigin, materialType.maxLength));
+			Vector2 relation = Grid.ToGrid (Vector2.ClampMagnitude (strech - partOrigin, partType.maxLength));
 			transform.position = (partOrigin + relation / 2);
 			transform.rotation = Quaternion.AngleAxis (Angles.Angle (Vector2.right, relation, false), Vector3.forward);
-			transform.localScale = new Vector3 (relation.magnitude, 0.25f, 2);
+			transform.localScale = new Vector3 (relation.magnitude, 1, 1);
 		}
 		public void EndStretch()
 		{
@@ -82,10 +80,9 @@ namespace Bridger
 
 		GameObject CreateJointCollider(Vector2 position)
 		{
-			GameObject joint = Instantiate<GameObject>(ConstructionHandler.instance.jointBase);
+			GameObject joint = Instantiate<GameObject>(ConstructionHandler.instance.jointBase); //TODO remove the connection though ConstructionHandler
 			joint.transform.position = (Vector3)position + Vector3.back*9;
 			joint.transform.SetParent(transform, true);
-			joint.transform.localScale = Vector3.one*(Grid.gridSize*4.0f/partLength) + Vector3.up*8;
 			joint.transform.localRotation = Quaternion.identity;
 			return joint;
 		}
