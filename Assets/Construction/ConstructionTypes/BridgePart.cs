@@ -13,7 +13,7 @@ namespace Bridger
         public GameObject jointPrefab;
         public BridgePartType partType;
 
-		private Rigidbody2D rigid;
+		public Rigidbody2D rigid;
 
 		private Vector2 _partOrigin;
 		public Vector2 partOrigin 	{ get{return _partOrigin;} private set{_partOrigin = value;} }
@@ -22,8 +22,8 @@ namespace Bridger
 		public float partLength	{ get{return transform.localScale.x;} }
 		public float partMass	{ get{return partLength * partType.massPerLength;} }
 
-		public BridgeJoint[] connectedTo { get {return _connectedTo.ToArray();} }
-		List<BridgeJoint> _connectedTo = new List<BridgeJoint>();
+        public BridgeJoint originConnection;
+        public BridgeJoint endConnection;
 
 		TransformData resetTransform;
 
@@ -33,20 +33,7 @@ namespace Bridger
 
 		void Update()
 		{
-			if (showStress)
-			{
-				// get average stress
-				float forceSum = 0.0f;
-				foreach (BridgeJoint bridgeJoint in connectedTo)
-				{
-					forceSum += bridgeJoint.joint.GetReactionForce(Time.deltaTime).magnitude;
-				}
-				float fraction = (forceSum / connectedTo.Length) / partType.strength;
-                foreach (MeshRenderer r in gameObject.GetComponentsInChildren<MeshRenderer>())
-                {
-                    r.material.color = new Color(fraction, 1 - fraction, 0);
-                }
-			}
+			
 		}
 
 		public static BridgePart Create(BridgePart part, Vector2 position)
@@ -75,80 +62,124 @@ namespace Bridger
 				Destroy(gameObject);
 				return;
 			}
-			SetupJoint(partOrigin);
-			SetupJoint(partEnd);
-			rigid.mass = partMass;
+            originConnection = SetupConnectionAtPosition(partOrigin);
+            endConnection = SetupConnectionAtPosition(partEnd);
+
+
+            rigid.mass = partMass;
 			resetTransform = new TransformData(transform);
 			Level.AddToLevel(this);
 		}
         
-		GameObject CreateJointCollider(Vector2 position)
+		BridgeJoint CreateBridgeJoint(Vector2 position)
 		{
-			GameObject joint = Instantiate<GameObject>(jointPrefab); //TODO remove the connection though ConstructionHandler
-			joint.transform.position = (Vector3)position + Vector3.back*9;
+			BridgeJoint joint = Instantiate<GameObject>(jointPrefab).GetComponent<BridgeJoint>(); //TODO remove the connection though ConstructionHandler
+            joint.transform.position = (Vector3)position + Vector3.back * 9;
             joint.transform.parent = transform;
             joint.transform.localScale = new Vector3(1 / partLength, 1, 1);
 			joint.transform.localRotation = Quaternion.identity;
 			return joint;
 		}
 
-		/// <summary>
-		///	Places joint for this part at position,
-		/// if a joint is already at specified position, connect to that joint.
-		/// </summary>
-		/// <param name="part">Part.</param>
-		/// <param name="position">Position.</param>
-		public void SetupJoint(Vector2 position)
-		{
-			BridgeJoint joint;
-			Collider2D[] joints = Physics2D.OverlapPointAll(position, 1<<9);
-			if (joints.Length > 0)
-			{
-				joint = joints[0].transform.parent.gameObject.AddComponent<BridgeJoint>();
-				joint.ConnectPart(this.rigid, position);
-				_connectedTo.Add(joint);
-			}
-			else
-			{
-				CreateJointCollider(position);
-			}
-		}
+        BridgeJoint SetupConnectionAtPosition(Vector2 pos)
+        {
+            Collider2D[] joints = Physics2D.OverlapPointAll(pos, 1 << 9);
+            BridgeJoint connection;
+            if (joints.Length > 0)
+            {
+                connection = joints[0].GetComponent<BridgeJoint>();//Obtain an already placed bridgeparts connections.
+                connection.ConnectPart(joints[0].transform.parent.GetComponent<BridgePart>(), this, pos);
+                return connection;
+            }
+            else
+            {
+                return CreateBridgeJoint(Grid.ToGrid(pos)); //Create a joint
+            }
+        }
 
-		public void Detach(BridgeJoint bridgejoint)
+        public void Detach(BridgeJoint bridgejoint)
 		{
-			if(_connectedTo.Contains(bridgejoint))
-			{
-				bridgejoint.enabled = false;
-				bridgejoint.joint.enabled = false;
-			}
+			//if(_connectedTo.Contains(bridgejoint))
+			//{
+			//	bridgejoint.enabled = false;
+			//	bridgejoint.joint.enabled = false;
+			//}
 		}
 
 		public void DetachAll()//TODO rename function
 		{
-			foreach(BridgeJoint bridgejoint in _connectedTo)
-			{
-				bridgejoint.enabled = false;
-				bridgejoint.joint.enabled = false;
-			}
+			//foreach(BridgeJoint bridgejoint in _connectedTo)
+			//{
+			//	bridgejoint.enabled = false;
+			//	bridgejoint.joint.enabled = false;
+			//}
 		}
 
 		public void Attach(BridgeJoint bridgejoint)
 		{
-			if(_connectedTo.Contains(bridgejoint))
-			{
-				bridgejoint.enabled = true;
-				bridgejoint.joint.enabled = true;
-			}
+			//if(_connectedTo.Contains(bridgejoint))
+			//{
+			//	bridgejoint.enabled = true;
+			//	bridgejoint.joint.enabled = true;
+			//}
 		}
 
 		public void AttachAll()//TODO rename function
 		{
-			foreach(BridgeJoint bridgejoint in _connectedTo)
-			{
-				bridgejoint.enabled = true;
-				bridgejoint.joint.enabled = true;
-			}
+			//foreach(BridgeJoint bridgejoint in _connectedTo)
+			//{
+			//	bridgejoint.enabled = true;
+			//	bridgejoint.joint.enabled = true;
+			//}
 		}
+
+        void FixedUpdate()
+        {
+            if (!editing) //TODO maybe add a check for build/play-mode
+            {
+                if (showStress)
+                {
+                    // get average stress
+                    float forceSum = 0.0f;
+                    foreach (HingeJoint2D connection in originConnection.connections)
+                    {
+                        forceSum += connection.GetReactionForce(Time.fixedDeltaTime).magnitude;
+                    }
+                    float average = forceSum / originConnection.connections.Count;
+
+                    forceSum = 0.0f;
+                    foreach (HingeJoint2D connection in endConnection.connections)
+                    {
+                        forceSum += connection.GetReactionForce(Time.fixedDeltaTime).magnitude;
+                        
+                        ///PHYSICSPART===========================
+                        float jointStrength = Mathf.Min(partType.strength, connection.GetComponent<BridgePart>().partType.strength);
+                        if (partType.strength > 0)
+                        {
+                            Vector3 force = connection.GetReactionForce(Time.deltaTime);
+                            if (force.magnitude > jointStrength)
+                            {
+                                connection.enabled = false;
+                                Level.Slowmo();
+                            }
+                        }
+                        ///PHYSICSPART===========================
+
+                    }
+                    average += forceSum / endConnection.connections.Count;
+                    float fraction = (average / 2) / partType.strength;
+
+                    foreach (MeshRenderer r in gameObject.GetComponentsInChildren<MeshRenderer>())
+                    {
+                        r.material.color = new Color(fraction, 1 - fraction, 0);
+                    }
+                }
+                foreach (HingeJoint2D joint in endConnection.connections)
+                {
+                    
+                }
+            }
+        }
 
 		public void Reset()
 		{
@@ -158,11 +189,15 @@ namespace Bridger
 			rigid.velocity = Vector2.zero;
 			rigid.angularVelocity = 0.0f;
 
-			foreach (BridgeJoint bj in gameObject.GetComponents<BridgeJoint>())
-			{
-				bj.Reset();
-			}
-		}
+            foreach (HingeJoint2D joint in endConnection.connections)
+            {
+                joint.enabled = true;
+            }
+            //foreach (BridgeJoint bj in gameObject.GetComponents<BridgeJoint>())
+            //{
+            //	bj.Reset();
+            //}
+        }
 		public void StartPhysics()
 		{
 			rigid.isKinematic = false;

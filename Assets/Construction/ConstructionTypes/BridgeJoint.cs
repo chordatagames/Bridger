@@ -1,83 +1,108 @@
 using UnityEngine;
+using System.Collections.Generic;
 
+
+/// <summary>
+/// * have an array of all joints
+/// 
+/// </summary>
 namespace Bridger
 {
-	[RequireComponent(typeof(Rigidbody2D))]
-	public class BridgeJoint : MonoBehaviour
-	{
+    /// <summary>
+    /// The BridgeJoint class is a holder for reference data of the joints connecting parts to each other.
+    /// </summary>
+    public class BridgeJoint : MonoBehaviour
+    {
+        private BridgePart anchor;
+        public List<HingeJoint2D> connections = new List<HingeJoint2D>();
 
-		BridgePart _anchorPart;
-		public BridgePart anchorPart
-		{
-			get
-			{
-				if(_anchorPart == null)
-				{_anchorPart = GetComponent<BridgePart>();}
-				return _anchorPart;
-			}
-		}
-		BridgePart _connectedPart;
-		public BridgePart connectedPart
-		{
-			get
-			{
-				if(_connectedPart == null)
-				{_connectedPart = joint.connectedBody.GetComponent<BridgePart>();}
-				return _connectedPart;
-			}
-		}
+        /// <summary>
+        /// This adds a new hinge joint to the <paramref name="anchor"/> 
+        /// and connects it to the <paramref name="connectedBody"/> through the <paramref name="position"/>
+        /// </summary>
+        /// <param name="anchor"></param>
+        /// <param name="connectedBody"></param>
+        /// <param name="position"></param>
+        public void ConnectPart(BridgePart anchor, BridgePart connectedBody, Vector2 position)
+        {
+            this.anchor = anchor;
+            HingeJoint2D joint = anchor.gameObject.AddComponent<HingeJoint2D>();
+            joint.enableCollision = false;
+            joint.connectedBody = connectedBody.rigid;
+            joint.connectedAnchor = Grid.ToGrid(connectedBody.transform.InverseTransformPoint(position));
+            joint.anchor = Grid.ToGrid(anchor.transform.InverseTransformPoint(position));
 
-		HingeJoint2D _joint;
-		public HingeJoint2D joint
-		{
-			get
-			{
-				if(_joint == null)
-				{_joint = gameObject.AddComponent<HingeJoint2D>();}
-				return _joint;
-			}
-		}
+            connections.Add(joint);
 
-		public float jointStrength	{ get{return Mathf.Min(anchorPart.partType.strength, connectedPart.partType.strength);} }
-		public float jointMass		{ get{return (anchorPart.partMass + connectedPart.partMass);} }
+        }
 
-		public void Start()
-		{
+        //	BridgePart _anchorPart;
+        //	public BridgePart anchorPart
+        //	{
+        //		get
+        //		{
+        //			if(_anchorPart == null)
+        //			{_anchorPart = GetComponent<BridgePart>();}
+        //			return _anchorPart;
+        //		}
+        //	}
+        //	BridgePart _connectedPart;
+        //	public BridgePart connectedPart
+        //	{
+        //		get
+        //		{
+        //			if(_connectedPart == null)
+        //			{_connectedPart = joint.connectedBody.GetComponent<BridgePart>();}
+        //			return _connectedPart;
+        //		}
+        //	}
 
-		}
+        //	HingeJoint2D _joint;
+        //	public HingeJoint2D joint
+        //	{
+        //		get
+        //		{
+        //			if(_joint == null)
+        //			{_joint = gameObject.AddComponent<HingeJoint2D>();}
+        //			return _joint;
+        //		}
+        //	}
+
+        //	
+        //	public float jointMass		{ get{return (anchorPart.partMass + connectedPart.partMass);} }
+
+        //	public void Start()
+        //	{
+
+        //	}
 
 
 
-		void FixedUpdate()
-		{
-			if(anchorPart.partType.strength > 0)
-			{
-                Vector3 force = joint.GetReactionForce(Time.deltaTime);
-                if (force.magnitude > jointStrength)
-				{
-					Break();
-					Level.Slowmo();
-				}
-                Debug.DrawLine(joint.anchor, force, Color.red,5f);
-			}
-		}
-		
-		public void ConnectPart(Rigidbody2D part, Vector2 position)
-		{
-			joint.enableCollision = false;
-			joint.connectedBody = part;
-			joint.connectedAnchor = Grid.ToGrid((Vector2)part.transform.InverseTransformPoint((Vector3)position));
-			joint.anchor = (Vector2)transform.InverseTransformPoint(part.transform.TransformPoint((Vector3)joint.connectedAnchor));
-		//	ConnectJoint(newJoint);
-		//	ConnectConstruction(part);//Connection must be set up for both parts for undo/redo functionality
-		}
-		public void Break()
-		{
-			joint.enabled = false;
-		}
-		public void Reset()
-		{
-			joint.enabled = true;
-		}
-	}
+        //	void FixedUpdate()
+        //	{
+        //		if(anchorPart.partType.strength > 0)
+        //		{
+        //               Vector3 force = joint.GetReactionForce(Time.deltaTime);
+        //               if (force.magnitude > jointStrength)
+        //			{
+        //				Break();
+        //				Level.Slowmo();
+        //			}
+        //               Debug.DrawLine(joint.anchor, force, Color.red,5f);
+        //		}
+        //	}
+
+        //public void Break()
+        //{
+        //    joint.enabled = false;
+        //}
+        //public void Reset()
+        //{
+        //    foreach (HingeJoint2D joint in connections)
+        //    {
+        //        joint.enabled = true;
+        //    }
+        //}
+        //}
+    }
 }

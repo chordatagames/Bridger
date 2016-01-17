@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -27,7 +28,7 @@ public class SelectableLevel : MonoBehaviour
 
 	public void EnterLevel()
 	{
-		Application.LoadLevel(levelID);
+        SceneManager.LoadScene(levelID);
 	}
 
 	public void Select()

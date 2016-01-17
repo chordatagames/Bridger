@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using Bridger;
 
@@ -28,7 +29,7 @@ public class LevelUIManager: MonoBehaviour
 	public void LoadLevelSelection()
 	{
 		Level.ResetLevel();
-		Application.LoadLevel("LevelMenu");
+        SceneManager.LoadScene("LevelMenu");
 	}
 
 	public void UnSlowmo()
