@@ -10,7 +10,6 @@ namespace Bridger
 		public static bool showStress = true;
 
 		public bool editing = true;
-        public GameObject jointPrefab;
         public BridgePartType partType;
 
 		public Rigidbody2D rigid;
@@ -73,7 +72,7 @@ namespace Bridger
         
 		BridgeJoint CreateBridgeJoint(Vector2 position)
 		{
-			BridgeJoint joint = Instantiate<GameObject>(jointPrefab).GetComponent<BridgeJoint>(); //TODO remove the connection though ConstructionHandler
+			BridgeJoint joint = Instantiate<GameObject>(ResourcesManager.Instance.junctionPrefab).GetComponent<BridgeJoint>(); //TODO remove the connection though ConstructionHandler
             joint.transform.position = (Vector3)position + Vector3.back * 9;
             joint.transform.parent = transform;
             joint.transform.localScale = new Vector3(1 / partLength, 1, 1);

@@ -7,7 +7,6 @@ namespace Bridger
 	[RequireComponent(typeof(UnityEngine.UI.Image))]
 	public class BridgeEditorArea : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
 	{
-        public BridgePart[] partPrefabs;
 
         static BridgePart currentPart;
         Vector2 pivot = Vector2.one * 0.5f;
@@ -76,13 +75,13 @@ namespace Bridger
 	        if(leftMouseDown(eventData))
 	        {
 			    currentPart = BridgePart.Create(
-			        partPrefabs[ConstructionControl.partType], 
+			        ResourcesManager.Instance.bridgePartPrefabs[ConstructionControl.partType], 
 			    	Input.GetKey(KeyCode.LeftShift) ? currentPart.partEnd : mousePosition(eventData));
 				currentPart.Stretch(mousePosition(eventData));
 			}
             if(rightMouseDown(eventData))
             {
-                if(ConstructionControl.partType < partPrefabs.Length-1)
+                if(ConstructionControl.partType < ResourcesManager.Instance.bridgePartPrefabs.Length-1)
                 {
                     ConstructionControl.partType++;
                 }
