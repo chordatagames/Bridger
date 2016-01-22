@@ -18,7 +18,6 @@ public class LowPolyTerrain : LowPolyMesh
 		resolution = Mathf.RoundToInt(terrainData.size.x/sampleScale);
 		
 		mapRelation = ((float)terrainData.heightmapResolution)/resolution;
-//		heightScale = 
 
 		base.CreateMesh();
 	}

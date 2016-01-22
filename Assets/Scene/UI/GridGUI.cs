@@ -25,8 +25,9 @@ public class GridGUI : MonoBehaviour
 	void LoadGridInfo()
 	{
 		cam = GetComponent<Camera>();
-		origin = Vector2.one*Grid.gridSize;
-		gridSize = new Vector2(4.0f,2.0f) * cam.orthographicSize;
+		origin = gridObject.position;
+		gridSize = gridObject.rect.size;
+
 	}
 
 	void OnPostRender()
@@ -41,25 +42,30 @@ public class GridGUI : MonoBehaviour
 		// begin grid
 		if (grid)
 		{
-			// Vertical Lines
+			
 			int lineCountX = 0;
-			for (float i = origin.x - (gridSize.x / 2 + pass); i <= origin.x + (gridSize.x / 2 - pass); i += pass)
+			for (float x = origin.x - gridSize.x * 0.5f; x < origin.x + gridSize.x * 0.5f; x += pass)
 			{
-				GL.Color( ((lineCountX % strongLineSpace == 0) ? secondaryColor : gridColor) );
-				GL.Vertex(new Vector3(i,-gridSize.y / 2, -cam.transform.position.z) + cam.transform.position);
-				GL.Vertex(new Vector3(i, gridSize.y / 2, -cam.transform.position.z) + cam.transform.position);
+				
+				int lineCountY = 0;
+				for (float y = origin.y + gridSize.y * 0.5f; y > origin.y - gridSize.y * 0.5f; y -= pass)
+				{
+					// Vertical Lines
+					GL.Color( ((lineCountX % strongLineSpace == 0) ? secondaryColor : gridColor) );
+					GL.Vertex(new Vector3(x, y) );
+					GL.Vertex(new Vector3(x, origin.y - gridSize.y * 0.5f));
+
+					// Horizontal Lines
+					GL.Color( ((lineCountY % strongLineSpace == 0) ? secondaryColor : gridColor) );
+					GL.Vertex(new Vector3(x, y));
+					GL.Vertex(new Vector3(origin.x + gridSize.x * 0.5f, y));
+
+					lineCountY++;
+				}
 				lineCountX++;
 			}
 
-			// Horizontal Lines
-			int lineCountY = 0;
-			for (float i = origin.y - (gridSize.y / 2 + pass); i <= origin.y + (gridSize.y / 2 - pass); i += pass)
-			{
-				GL.Color( ((lineCountY % strongLineSpace == 0) ? secondaryColor : gridColor) );
-				GL.Vertex(new Vector3(-gridSize.x / 2, i, -cam.transform.position.z) + cam.transform.position);
-				GL.Vertex(new Vector3( gridSize.x / 2, i, -cam.transform.position.z) + cam.transform.position);
-				lineCountY++;
-			}
+
 			
 		}
         // end grid
