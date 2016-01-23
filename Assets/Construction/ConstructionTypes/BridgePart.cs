@@ -7,7 +7,7 @@ namespace Bridger
 	[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 	public class BridgePart : MonoBehaviour, IReloadable, IRevertable
 	{
-		public static bool showStress = false;
+		public static bool showStress = true;
 
 		public bool editing = true;
         public BridgePartType partType;
@@ -53,13 +53,13 @@ namespace Bridger
 			transform.rotation = Quaternion.AngleAxis (Angles.Angle (Vector2.right, relation, false), Vector3.forward);
 			transform.localScale = new Vector3 (relation.magnitude, 1, 1);
 		}
-		public void EndStretch()
+		public bool EndStretch()
 		{
 			editing = false;
 			if(partLength < Grid.gridSize)
 			{
 				Destroy(gameObject);
-				return;
+				return false;
 			}
             originConnection = SetupConnectionAtPosition(partOrigin);
             endConnection = SetupConnectionAtPosition(partEnd);
@@ -68,6 +68,7 @@ namespace Bridger
             rigid.mass = partMass;
 			resetTransform = new TransformData(transform);
 			Level.AddToLevel(this);
+			return true;
 		}
         
 		BridgeJoint CreateBridgeJoint(Vector2 position)
