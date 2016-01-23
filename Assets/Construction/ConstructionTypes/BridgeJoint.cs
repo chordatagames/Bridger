@@ -14,7 +14,7 @@ namespace Bridger
     public class BridgeJoint : MonoBehaviour
     {
         private BridgePart anchor;
-        public List<HingeJoint2D> connections = new List<HingeJoint2D>();
+        public List<AnchoredJoint2D> connections = new List<AnchoredJoint2D>();
 
         /// <summary>
         /// This adds a new hinge joint to the <paramref name="anchor"/> 
@@ -25,16 +25,47 @@ namespace Bridger
         /// <param name="position"></param>
         public void ConnectPart(BridgePart anchor, BridgePart connectedBody, Vector2 position)
         {
-            this.anchor = anchor;
-            HingeJoint2D joint = anchor.gameObject.AddComponent<HingeJoint2D>();
+			AnchoredJoint2D joint;
+
+			this.anchor = anchor;
+
+
+			if (anchor is RopePart)
+			{
+				joint = SetupRope (anchor as RopePart, connectedBody, position);
+			}
+			else if (connectedBody is RopePart)
+			{
+				joint = SetupRope (connectedBody as RopePart, anchor, position);
+			}
+			else
+			{
+				joint = anchor.gameObject.AddComponent<HingeJoint2D>();
+				joint.connectedBody = connectedBody.rigid;
+
+				joint.anchor = Grid.ToGrid(anchor.transform.InverseTransformPoint(position));
+				joint.connectedAnchor = Grid.ToGrid(connectedBody.transform.InverseTransformPoint(position));
+			}
+
+
             joint.enableCollision = false;
-            joint.connectedBody = connectedBody.rigid;
-            joint.connectedAnchor = Grid.ToGrid(connectedBody.transform.InverseTransformPoint(position));
-            joint.anchor = Grid.ToGrid(anchor.transform.InverseTransformPoint(position));
+            
 
             connections.Add(joint);
-
         }
+
+		DistanceJoint2D SetupRope(RopePart anchor, BridgePart other, Vector2 position)
+		{
+			DistanceJoint2D joint = anchor.gameObject.AddComponent<DistanceJoint2D>();
+			joint.connectedBody = other.rigid;
+
+			joint.distance = anchor.partLength * 0.5f;
+			joint.maxDistanceOnly = true;
+
+			joint.anchor = Grid.ToGrid(Vector3.zero);
+			joint.connectedAnchor = Grid.ToGrid(other.transform.InverseTransformPoint(position));
+			return joint;
+		}
 
         //	BridgePart _anchorPart;
         //	public BridgePart anchorPart
