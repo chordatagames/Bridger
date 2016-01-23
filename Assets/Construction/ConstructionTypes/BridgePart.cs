@@ -7,7 +7,7 @@ namespace Bridger
 	[RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D))]
 	public class BridgePart : MonoBehaviour, IReloadable, IRevertable
 	{
-		public static bool showStress = true;
+		public static bool showStress = false;
 
 		public bool editing = true;
         public BridgePartType partType;
@@ -132,7 +132,7 @@ namespace Bridger
 			//}
 		}
 
-        void FixedUpdate()
+        public virtual void FixedUpdate()
         {
             if (!editing) //TODO maybe add a check for build/play-mode
             {
@@ -140,14 +140,14 @@ namespace Bridger
                 {
                     // get average stress
                     float forceSum = 0.0f;
-                    foreach (HingeJoint2D connection in originConnection.connections)
+                    foreach (AnchoredJoint2D connection in originConnection.connections)
                     {
                         forceSum += connection.GetReactionForce(Time.fixedDeltaTime).magnitude;
                     }
                     float average = forceSum / originConnection.connections.Count;
 
                     forceSum = 0.0f;
-                    foreach (HingeJoint2D connection in endConnection.connections)
+                    foreach (AnchoredJoint2D connection in endConnection.connections)
                     {
                         forceSum += connection.GetReactionForce(Time.fixedDeltaTime).magnitude;
                         
@@ -173,7 +173,7 @@ namespace Bridger
                         r.material.color = new Color(fraction, 1 - fraction, 0);
                     }
                 }
-                foreach (HingeJoint2D joint in endConnection.connections)
+                foreach (AnchoredJoint2D joint in endConnection.connections)
                 {
                     
                 }
@@ -188,7 +188,7 @@ namespace Bridger
 			rigid.velocity = Vector2.zero;
 			rigid.angularVelocity = 0.0f;
 
-            foreach (HingeJoint2D joint in endConnection.connections)
+            foreach (AnchoredJoint2D joint in endConnection.connections)
             {
                 joint.enabled = true;
             }
