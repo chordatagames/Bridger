@@ -102,7 +102,12 @@ namespace Bridger
 		{
             if (leftMouseDown(eventData))
             {
-                currentPart.EndStretch();
+                if(currentPart.EndStretch())
+                {
+                    ResourcesManager.Instance.audioMaster.pitch = Random.Range(0.45f, 0.65f); // these are magic numbers, but who cares
+                    ResourcesManager.Instance.audioMaster.clip = currentPart.partType.placementSound;
+                    ResourcesManager.Instance.audioMaster.Play();
+                }
             }
 		}
 	}

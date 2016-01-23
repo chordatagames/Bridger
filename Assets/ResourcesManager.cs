@@ -10,6 +10,23 @@ public class ResourcesManager : MonoBehaviour
 
     public BridgePart[] bridgePartPrefabs;
     public GameObject junctionPrefab;
+    private AudioSource _audioMaster;
+    public AudioSource audioMaster
+    {
+        get
+        {
+            if(_audioMaster == null)
+            {
+                _audioMaster = GetComponent<AudioSource>();
+            }
+            if(_audioMaster == null)
+            {
+                _audioMaster = gameObject.AddComponent<AudioSource>();
+            }
+            return _audioMaster;
+
+        }
+   }
 
 
     public static ResourcesManager Instance
