@@ -13,7 +13,7 @@ namespace Bridger
     /// </summary>
     public class BridgeJoint : MonoBehaviour
     {
-        private BridgePart anchor;
+        public BridgePart anchor;
         public List<HingeJoint2D> connections = new List<HingeJoint2D>();
 
         /// <summary>

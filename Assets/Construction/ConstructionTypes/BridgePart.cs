@@ -14,7 +14,8 @@ namespace Bridger
 
 		public Rigidbody2D rigid;
 
-		private Vector2 _partOrigin;
+        public Vector2 partDirection;
+        private Vector2 _partOrigin;
 		public Vector2 partOrigin 	{ get{return _partOrigin;} private set{_partOrigin = value;} }
 		public Vector2 partEnd 		{ get{return Grid.ToGrid(transform.position + transform.right * partLength/2);} }
 
@@ -53,21 +54,23 @@ namespace Bridger
 			transform.rotation = Quaternion.AngleAxis (Angles.Angle (Vector2.right, relation, false), Vector3.forward);
 			transform.localScale = new Vector3 (relation.magnitude, 1, 1);
 		}
-		public void EndStretch()
+		public virtual bool EndStretch()
 		{
 			editing = false;
 			if(partLength < Grid.gridSize)
 			{
 				Destroy(gameObject);
-				return;
+				return false;
 			}
             originConnection = SetupConnectionAtPosition(partOrigin);
             endConnection = SetupConnectionAtPosition(partEnd);
 
+            partDirection = (partEnd - partOrigin).normalized;
 
             rigid.mass = partMass;
 			resetTransform = new TransformData(transform);
 			Level.AddToLevel(this);
+            return true;
 		}
         
 		BridgeJoint CreateBridgeJoint(Vector2 position)
@@ -132,7 +135,7 @@ namespace Bridger
 			//}
 		}
 
-        void FixedUpdate()
+        internal void FixedUpdate()
         {
             if (!editing) //TODO maybe add a check for build/play-mode
             {
