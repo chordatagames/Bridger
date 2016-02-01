@@ -78,7 +78,7 @@ $RECYCLE.BIN/
 #Visual Studio weird thingy solution I guess
 bin/
 obj/
-.vs/Bridger/v14/.suo
+.vs/
 
 #Testing Level
 Assets/Scenes/Testing Level.unity
