@@ -174,12 +174,12 @@ namespace Bridger
 
 		void SetupConstructionHandler()
 		{
-			Transform ch = parentOfNecessities.Find("ConstructionHandler");
-			ConstructionHandler chScript = ch.GetComponent<ConstructionHandler> ();
-			chScript.constructionBorder.x = -gapSize/2 - buildZoneLeft;
-			chScript.constructionBorder.y = gapHeight - buildZoneDown;
-			chScript.constructionBorder.width = buildZoneLeft + gapSize + buildZoneRight;
-			chScript.constructionBorder.height = buildZoneUp + buildZoneUp;
+			//Transform ch = parentOfNecessities.Find("ConstructionHandler");
+			//ConstructionHandler chScript = ch.GetComponent<ConstructionHandler> ();
+			//chScript.constructionBorder.x = -gapSize/2 - buildZoneLeft;
+			//chScript.constructionBorder.y = gapHeight - buildZoneDown;
+			//chScript.constructionBorder.width = buildZoneLeft + gapSize + buildZoneRight;
+			//chScript.constructionBorder.height = buildZoneUp + buildZoneUp;
 		}
 
 		void SetupCar ()

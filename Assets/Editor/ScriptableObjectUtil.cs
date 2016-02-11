@@ -38,7 +38,7 @@ public static class ScriptableObjectUtil
 	[MenuItem("Assets/Create/Bridger/ConstructionMaterialsBase")]
 	public static void CreateConstructionMaterialsBaseAsset()
 	{
-		CreateAsset<Bridger.ConstructionMaterials>();
+		//CreateAsset<Bridger.ConstructionMaterials>();
 	}
 	[MenuItem("Assets/Create/AssetTexture")]
 	static void CreateTextures()
