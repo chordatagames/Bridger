@@ -5,12 +5,12 @@ namespace Bridger
 {
 
 	[RequireComponent(typeof(UnityEngine.UI.Image))]
-	public class BridgeEditorArea : MonoBehaviour, /*IPointerDownHandler, IPointerUpHandler,*/ IDragHandler
+	public class BridgeEditorArea : MonoBehaviour, IPointerDownHandler, /*IPointerUpHandler,*/ IDragHandler
 	{
 		BridgeConstruction visuals;
 		static BridgePart currentPart;
 		Vector2 pivot = Vector2.one * 0.5f;
-		Rect _editorArea = new Rect();
+		Rect _editorArea;
 		Rect editorArea
 		{
 			get
@@ -33,26 +33,23 @@ namespace Bridger
 
 		Vector2 mousePosition(PointerEventData eventData)
 		{
-
 			Vector2 position = eventData.pressEventCamera.ScreenToWorldPoint(eventData.position);
-			if (!editorArea.Contains(position))
+			Vector2 clampedPosition = position;
+            if (!editorArea.Contains(position))
 			{
 				Vector2 stretch = position - placementOrigin;
-				Debug.DrawLine(placementOrigin, position, Color.cyan);
-				Debug.DrawLine(placementOrigin, editorArea.max,Color.magenta);
-				if (stretch.x / stretch.y > (editorArea.max - placementOrigin).x / (editorArea.max - placementOrigin).y)
-				{
+				Vector2 deltaSize = editorArea.max - placementOrigin;
 
+				if (stretch.x / stretch.y > deltaSize.x / deltaSize.y)
+				{
+					float x = deltaSize.y * stretch.x / stretch.y;
+					float y = deltaSize.y;
+					clampedPosition.Set(x, y);
 				}
-				else
-				{
-					//BridgeMath.ProjectPointOnLine(new Vector2(editorArea.width * 0.5f, editorArea.height * 0.5f * Mathf.Sign))
-                }
-
-
+				
 			}
-
-			return position;
+			
+			return clampedPosition;
 		}
 
 		void Update()
@@ -86,7 +83,8 @@ namespace Bridger
 
 		public void OnDrag(PointerEventData eventData)
 		{
-			mousePosition(eventData);
+			Debug.DrawLine(placementOrigin, mousePosition(eventData), Color.red);
+			
 		}
 
 		//	public void OnPointerUp(PointerEventData eventData)

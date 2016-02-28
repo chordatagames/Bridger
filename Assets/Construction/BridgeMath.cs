@@ -14,35 +14,83 @@ public static class BridgeMath
 		return a + (b - a) * t;
 	}
 
-	//public static Vector2 ProjectPointOnLineSegment(Vector2 linePoint1, Vector2 linePoint2, Vector2 point)
-	//{
+	public static bool LinesIntersect(Vector2 a, Vector2 b, Vector2 aDir, Vector2 bDir, out Vector2? intersection)
+	{
+		//line1 a + t*aDir
+		//line2 b + u*bDir
 
-	//	Vector3 vector = linePoint2 - linePoint1;
+		Vector2 c = (b - a);
 
-	//	Vector3 projectedPoint = ProjectPointOnLine(linePoint1, vector.normalized, point);
+		float crossADirBDir = Vector3.Cross(aDir, bDir).magnitude;
 
-	//	int side = PointOnWhichSideOfLineSegment(linePoint1, linePoint2, projectedPoint);
 
-	//	//The projected point is on the line segment
-	//	if (side == 0)
-	//	{
+		//t(aDir x bDir) = (b - a) x bDir
 
-	//		return projectedPoint;
-	//	}
+		// t = (b - a) x bDir / (aDir x bDir)
 
-	//	if (side == 1)
-	//	{
+		//u(bDir x aDir) = (a - b) x aDir
 
-	//		return linePoint1;
-	//	}
+		//u = (a - b) x aDir / (bDir x aDir)    => bDir x aDir = - (aDir x bDir)
 
-	//	if (side == 2)
-	//	{
+		//-u = (a - b) x aDir / (aDir x bDir)
 
-	//		return linePoint2;
-	//	}
+		//u = (b - a) x aDir / (aDir x bDir) 
+		if (crossADirBDir == 0)
+		{
+				intersection = null;
+				return false;
+		}
+		else
+		{
+			float t = (Vector3.Cross(c, bDir).magnitude / crossADirBDir);
+			float u = (Vector3.Cross(c, aDir).magnitude / crossADirBDir);
+			if ( 0 <= t && t <= 1 && 0 <= u && u <= 1)
+			{
+				//a + t * aDir = b + (c x aDir) / (aDir x bDir) * bDir
+				
 
-	//	//output is invalid
-	//	return Vector3.zero;
-	//}
-}
+
+				//aDir * t + a = b * c
+
+				//a + c x bDir / (aDir x bDir) * aDir = b + c x aDir / (aDir x bDir) * bDir | * (aDir x bDir)
+				//a + c x bDir / aDir = b + c x aDir / bDir
+			}
+		}
+		
+
+
+
+		intersection = null;
+		return false;
+	}
+/*public static bool LineLineIntersection(out Vector3 intersection, Vector3 linePoint1, Vector3 lineVec1, Vector3 linePoint2, Vector3 lineVec2){
+ 
+		intersection = Vector3.zero;
+ 
+		Vector3 lineVec3 = linePoint2 - linePoint1;
+		Vector3 crossVec1and2 = Vector3.Cross(lineVec1, lineVec2);
+		Vector3 crossVec3and2 = Vector3.Cross(lineVec3, lineVec2);
+ 
+		float planarFactor = Vector3.Dot(lineVec3, crossVec1and2);
+ 
+		//Lines are not coplanar. Take into account rounding errors.
+		if((planarFactor >= 0.00001f) || (planarFactor <= -0.00001f)){
+ 
+			return false;
+		}
+ 
+		//Note: sqrMagnitude does x*x+y*y+z*z on the input vector.
+		float s = Vector3.Dot(crossVec3and2, crossVec1and2) / crossVec1and2.sqrMagnitude;
+ 
+		if((s >= 0.0f) && (s <= 1.0f)){
+ 
+			intersection = linePoint1 + (lineVec1 * s);
+			return true;
+		}
+ 
+		else{
+			return false;       
+		}
+	}
+	*/
+	}
