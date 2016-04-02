@@ -7,6 +7,7 @@ namespace Bridger
 
 	[RequireComponent(typeof(UnityEngine.UI.Image))]
 	public class BridgeEditorArea : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
+
 	{
 		BridgeConstruction visuals;
 		static BridgePart currentPart;
@@ -38,7 +39,6 @@ namespace Bridger
 			if(!editorArea.Contains(position))
 			{
 				BridgeMath.RectangleIntersects(placementOrigin, position, editorArea, out clampedPosition);
-				Debug.Log(clampedPosition);
 			}
 			return clampedPosition;
 		}
