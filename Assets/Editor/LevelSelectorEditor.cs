@@ -21,8 +21,9 @@ public class LevelSelectorEditor : Editor
 		levelSelector = target as LevelSelector;
 
 		handleTransform = levelSelector.transform;
-		handleRotation = Quaternion.identity;
-		tangents = new Vector3[levelSelector.availableLevels.Length,2];
+		handleRotation = Tools.pivotRotation == PivotRotation.Local ?
+            handleTransform.rotation : Quaternion.identity;
+        tangents = new Vector3[levelSelector.availableLevels.Length,2];
 	}
 
 	public override void OnInspectorGUI ()

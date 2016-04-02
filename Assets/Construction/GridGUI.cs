@@ -17,7 +17,7 @@ public class GridGUI : MonoBehaviour
 	private Vector2 gridSize;
 
 
-	void Start()
+	void Start()//TODO set up a public field for camera and move this script onto the editorArea
 	{
 		LoadGridInfo();
 	}

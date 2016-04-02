@@ -1,48 +1,54 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public static class BridgeMath
 {
-	public static Vector2 ProjectPointOnLine(Vector2 a, Vector2 b, Vector2 point)
+	public static bool LineIntersects(Vector2 a1, Vector2 a2, Vector2 b1, Vector2 b2, out Vector2 intersection)
 	{
+		intersection = Vector2.zero;
 
-		//get vector from point on line to point in space
-		Vector2 projectionLine = point - a;
+		Vector2 b = a2 - a1;
+		Vector2 d = b2 - b1;
+		float bDotDPerp = b.x * d.y - b.y * d.x;
 
-		float t = Vector3.Dot(projectionLine, (b - a));
+		// if b dot d == 0, it means the lines are parallel so have infinite intersection points
+		if(bDotDPerp == 0)
+			return false;
 
-		return a + (b - a) * t;
+		Vector2 c = b1 - a1;
+		float t = ( c.x * d.y - c.y * d.x ) / bDotDPerp;
+		if(t < 0 || t > 1)
+			return false;
+
+		float u = ( c.x * b.y - c.y * b.x ) / bDotDPerp;
+		if(u < 0 || u > 1)
+			return false;
+
+		intersection = a1 + t * b;
+
+		return true;
 	}
 
-	//public static Vector2 ProjectPointOnLineSegment(Vector2 linePoint1, Vector2 linePoint2, Vector2 point)
-	//{
+	public static bool RectangleIntersects(Vector2 a1, Vector2 a2, Rect rect, out Vector2 intersection)
+	{
+		intersection = Vector2.zero;
+		
+		Vector2 leftBottom = new Vector2(rect.xMin, rect.yMin);
+		Vector2 leftTop = new Vector2(rect.xMin, rect.yMax);
+		Vector2 rightBottom = new Vector2(rect.xMax, rect.yMin);
+		Vector2 rightTop = new Vector2(rect.xMax, rect.yMax);
+		//left side
+		if(LineIntersects(a1, a2, leftBottom, leftTop, out intersection))
+		{ return true; }
+		//Top side
+		if(LineIntersects(a1, a2, rightTop, leftTop, out intersection))
+		{ return true; }
+		//Right side
+		if(LineIntersects(a1, a2, rightTop, rightBottom, out intersection))
+		{ return true; }
+		//Bottom side
+		if(LineIntersects(a1, a2, rightBottom, leftBottom, out intersection))
+		{ return true; }
 
-	//	Vector3 vector = linePoint2 - linePoint1;
-
-	//	Vector3 projectedPoint = ProjectPointOnLine(linePoint1, vector.normalized, point);
-
-	//	int side = PointOnWhichSideOfLineSegment(linePoint1, linePoint2, projectedPoint);
-
-	//	//The projected point is on the line segment
-	//	if (side == 0)
-	//	{
-
-	//		return projectedPoint;
-	//	}
-
-	//	if (side == 1)
-	//	{
-
-	//		return linePoint1;
-	//	}
-
-	//	if (side == 2)
-	//	{
-
-	//		return linePoint2;
-	//	}
-
-	//	//output is invalid
-	//	return Vector3.zero;
-	//}
+		return false;
+	}
 }
